@@ -1,0 +1,2078 @@
+[
+    {
+        "id": "1",
+        "name": "Growing of cereals"
+    },
+    {
+        "id": "2",
+        "name": "Growing sugar cane"
+    },
+    {
+        "id": "3",
+        "name": "Growing of Oil Seeds"
+    },
+    {
+        "id": "4",
+        "name": "Growing of pulses"
+    },
+    {
+        "id": "5",
+        "name": "Growing of Coffee and tea"
+    },
+    {
+        "id": "6",
+        "name": "Growing of pepper and spices"
+    },
+    {
+        "id": "7",
+        "name": "Floriculture"
+    },
+    {
+        "id": "8",
+        "name": "Vegetable, fruit, plant and plant seed production"
+    },
+    {
+        "id": "9",
+        "name": "Growing of Animal feed(fodder)"
+    },
+    {
+        "id": "10",
+        "name": "Cattle and pack animals husbandery"
+    },
+    {
+        "id": "11",
+        "name": "Raising birds and poultry"
+    },
+    {
+        "id": "12",
+        "name": "Bee keeping"
+    },
+    {
+        "id": "13",
+        "name": "silkworm development"
+    },
+    {
+        "id": "14",
+        "name": "Agricultural Support Service"
+    },
+    {
+        "id": "15",
+        "name": "Hunting,trapping game propagation, and related activities"
+    },
+    {
+        "id": "16",
+        "name": "Forestry And Related activities"
+    },
+    {
+        "id": "17",
+        "name": "Sea animals ,hatcheries, breeding and growing activities"
+    },
+    {
+        "id": "18",
+        "name": "Extraction of crude petroleum and natural gas"
+    },
+    {
+        "id": "19",
+        "name": "Activities related to oil and gas extraction"
+    },
+    {
+        "id": "20",
+        "name": "Exploration of minerals"
+    },
+    {
+        "id": "21",
+        "name": "Excavation of minerals"
+    },
+    {
+        "id": "22",
+        "name": "Quarrying of minerals"
+    },
+    {
+        "id": "23",
+        "name": "Stone carvings, clay, sand, and similar mining and quarrying"
+    },
+    {
+        "id": "24",
+        "name": "Digging of chemicals and fertilizers"
+    },
+    {
+        "id": "25",
+        "name": "Extraction and evaporation of salt"
+    },
+    {
+        "id": "26",
+        "name": "Mining supportive activities"
+    },
+    {
+        "id": "27",
+        "name": "Producing, processing and preserving of meat and meat products"
+    },
+    {
+        "id": "28",
+        "name": "Processing and preserving of sea food animals and their products"
+    },
+    {
+        "id": "29",
+        "name": "Processing and preserving of fruit and vegetables"
+    },
+    {
+        "id": "30",
+        "name": "Manufacturing of edible oil"
+    },
+    {
+        "id": "31",
+        "name": "Manufacturing of dairy and dairy products"
+    },
+    {
+        "id": "32",
+        "name": "Grinding/manufacturing of grains"
+    },
+    {
+        "id": "33",
+        "name": "Manufacturing of starches, starch and condiments products"
+    },
+    {
+        "id": "34",
+        "name": "Manufacturing of fast foods"
+    },
+    {
+        "id": "35",
+        "name": "Manufacturing of bakery products"
+    },
+    {
+        "id": "36",
+        "name": "Manufacturing of sugar"
+    },
+    {
+        "id": "37",
+        "name": "Manufacturing of confectionery foods (including biscuits, cocoa, chocolate, candy and chewing gum)"
+    },
+    {
+        "id": "38",
+        "name": "Salt production"
+    },
+    {
+        "id": "39",
+        "name": "Manufacturing of pasta, macaroni, noodles, couscous and similar products"
+    },
+    {
+        "id": "40",
+        "name": "Manufacturing of honey and honey products"
+    },
+    {
+        "id": "41",
+        "name": "Manufacturing of Coffee and tea"
+    },
+    {
+        "id": "42",
+        "name": "Manufacturing of animal feed raw products"
+    },
+    {
+        "id": "43",
+        "name": "Manufacturing of animal feeds"
+    },
+    {
+        "id": "44",
+        "name": "Manufacturing of potable water"
+    },
+    {
+        "id": "45",
+        "name": "Manufacturing of alcohol free drinks (Except potable water)"
+    },
+    {
+        "id": "46",
+        "name": "Manufacturing of alcohol drinks"
+    },
+    {
+        "id": "47",
+        "name": "Manufacturing of tobacco products"
+    },
+    {
+        "id": "48",
+        "name": "Manufacture of made-up textile articles, spinning and weaving (except apparel)"
+    },
+    {
+        "id": "49",
+        "name": "Manufacture of textile articles (including fur apparel)"
+    },
+    {
+        "id": "50",
+        "name": "Manufacture of carpets, rugs and mats"
+    },
+    {
+        "id": "51",
+        "name": "Manufacture of bags, sacks, rapping and packing materials from yarns and the product of yarns"
+    },
+    {
+        "id": "52",
+        "name": "Manufacture of knitted and crocheted  fabrics and articles"
+    },
+    {
+        "id": "53",
+        "name": "Tunning and finishing of leather and hides"
+    },
+    {
+        "id": "54",
+        "name": "Manufacture of artificial leather Substitutes"
+    },
+    {
+        "id": "55",
+        "name": "Manufacture of leather and leather substitutes wearings"
+    },
+    {
+        "id": "56",
+        "name": "Manufacture of foot wear"
+    },
+    {
+        "id": "57",
+        "name": "Manufacture of wooden and wooden products"
+    },
+    {
+        "id": "58",
+        "name": "Manufacture of paper and paper products"
+    },
+    {
+        "id": "59",
+        "name": "Manufacture of pulp, paper and paper boards"
+    },
+    {
+        "id": "60",
+        "name": "Printing and related activities"
+    },
+    {
+        "id": "61",
+        "name": "Manufacturing of educational support equipments"
+    },
+    {
+        "id": "62",
+        "name": "Manufacture of coke oven products"
+    },
+    {
+        "id": "63",
+        "name": "Manufacture of refined petroleum products"
+    },
+    {
+        "id": "64",
+        "name": "Manufacture of basic chemicals"
+    },
+    {
+        "id": "65",
+        "name": "Manufacture of fertilizers and nitrogen compounds"
+    },
+    {
+        "id": "66",
+        "name": "Manufacture of basic plastics (in primary form) and of synthetic rubber"
+    },
+    {
+        "id": "67",
+        "name": "Manufacture of tyres and plastic products"
+    },
+    {
+        "id": "68",
+        "name": "Manufacture of batteries"
+    },
+    {
+        "id": "69",
+        "name": "Manufacture of pesticides andother agrochemical products"
+    },
+    {
+        "id": "70",
+        "name": "Manufacture of paints, varnishes and similar coatings, printing ink and mastics"
+    },
+    {
+        "id": "71",
+        "name": "Manufacture of pharmaceuticals and medicinal chemicals for human use"
+    },
+    {
+        "id": "72",
+        "name": "Manufacture of pharmaceuticals and medicinal chemicals for veterinary use"
+    },
+    {
+        "id": "73",
+        "name": "Manufacture of chemicals used for other medical manufacture, food and medicine including precursor chemicals"
+    },
+    {
+        "id": "74",
+        "name": "Manufacture of cleaning, cosmotics and inputs"
+    },
+    {
+        "id": "75",
+        "name": "Manufacture of iron, steel and metalic mineral products"
+    },
+    {
+        "id": "76",
+        "name": "Forging, pressing, stamping and rollforming of metal and powder metallurgy"
+    },
+    {
+        "id": "77",
+        "name": "Manufacture of glass and glasses product"
+    },
+    {
+        "id": "78",
+        "name": "Manufacture of cement, lime and plaster"
+    },
+    {
+        "id": "79",
+        "name": "Manufacture of articles of concrete, cement and plaster"
+    },
+    {
+        "id": "80",
+        "name": "Manufacture of structural clay and ceramic products"
+    },
+    {
+        "id": "81",
+        "name": "Manufacturing of stone products"
+    },
+    {
+        "id": "82",
+        "name": "Manufacture of non metalic mineral products"
+    },
+    {
+        "id": "83",
+        "name": "Processing and Refining of Minerals"
+    },
+    {
+        "id": "84",
+        "name": "Processing and Casting Minerals"
+    },
+    {
+        "id": "85",
+        "name": "Processing and Casting of Iron, metals and nonferrous metals"
+    },
+    {
+        "id": "86",
+        "name": "Manufacture of primary nonferrous metal products, excluding precious metals (such as aliminum, zink, lid, tantalum, nickel and copper)"
+    },
+    {
+        "id": "87",
+        "name": "Manufacture of structural metal products"
+    },
+    {
+        "id": "88",
+        "name": "Manufacture of general purpose machinery"
+    },
+    {
+        "id": "89",
+        "name": "Manufacture of special purpose machinery"
+    },
+    {
+        "id": "90",
+        "name": "Manufacture of weapons and ammunition"
+    },
+    {
+        "id": "91",
+        "name": "Manufacture of electrical machinery , apparatus utilities"
+    },
+    {
+        "id": "92",
+        "name": "Manufacture of communication machineries, spare parts and apparatus and utilities"
+    },
+    {
+        "id": "93",
+        "name": "Manufacture of instruments and appliances for measuring and checking"
+    },
+    {
+        "id": "94",
+        "name": "Manufacture of radiation emitting equipments and radio active sources"
+    },
+    {
+        "id": "95",
+        "name": "Manufacture of photographic equipments and optical Instruments"
+    },
+    {
+        "id": "96",
+        "name": "Manufacture of medical instruments and appliances"
+    },
+    {
+        "id": "97",
+        "name": "Manufacture of motor vehicles"
+    },
+    {
+        "id": "98",
+        "name": "Manufacture of transport vehicles' parts, spare parts and tyres"
+    },
+    {
+        "id": "99",
+        "name": "Manufacture of motorcycles"
+    },
+    {
+        "id": "100",
+        "name": "Manufacture of bicycles and carriages"
+    },
+    {
+        "id": "101",
+        "name": "Manufacture of transport vehicles trailers"
+    },
+    {
+        "id": "102",
+        "name": "Manufacture of ships and boats"
+    },
+    {
+        "id": "103",
+        "name": "Manufacture of railway and tramway locomotives and rolling stock vehicles"
+    },
+    {
+        "id": "104",
+        "name": "Manufacture of aircraft and spacecraft"
+    },
+    {
+        "id": "105",
+        "name": "Manufacture of household and office furnitures"
+    },
+    {
+        "id": "106",
+        "name": "Manufacture/produce of spring sponges and foam products"
+    },
+    {
+        "id": "107",
+        "name": "Manufacture of computer, computer equipments and apparatus"
+    },
+    {
+        "id": "108",
+        "name": "Manufacture of recreational equipments"
+    },
+    {
+        "id": "109",
+        "name": "Manufacture of handicrafts, souvenirs, artifacts and artificial jewelries"
+    },
+    {
+        "id": "110",
+        "name": "Software development (including design, enrichment and implementation)"
+    },
+    {
+        "id": "111",
+        "name": "Manufacture of stationeries (except paper and paper products)"
+    },
+    {
+        "id": "112",
+        "name": "Manufacture of buttons, buckles, slide fasteners, etc."
+    },
+    {
+        "id": "113",
+        "name": "Manufacture of number plates, signs and advertising displays (non electrical)"
+    },
+    {
+        "id": "114",
+        "name": "Recycling of waste and scraps"
+    },
+    {
+        "id": "115",
+        "name": "Manufacture of brushes and brooms"
+    },
+    {
+        "id": "116",
+        "name": "Generating electricity"
+    },
+    {
+        "id": "117",
+        "name": "Transmission, distribution and sale of electric power"
+    },
+    {
+        "id": "118",
+        "name": "Extending electric lines"
+    },
+    {
+        "id": "119",
+        "name": "Gas distribution by line"
+    },
+    {
+        "id": "120",
+        "name": "Boiler and hot water service"
+    },
+    {
+        "id": "121",
+        "name": "Water collection, clearance and distribution service"
+    },
+    {
+        "id": "122",
+        "name": "Sewage Disposal"
+    },
+    {
+        "id": "123",
+        "name": "Bleach and contaminants removing"
+    },
+    {
+        "id": "124",
+        "name": "Dry waste removing"
+    },
+    {
+        "id": "125",
+        "name": "Road works contractor"
+    },
+    {
+        "id": "126",
+        "name": "Building works Contractor"
+    },
+    {
+        "id": "127",
+        "name": "Water works Contractor"
+    },
+    {
+        "id": "128",
+        "name": "Construction site preparation Contractor"
+    },
+    {
+        "id": "129",
+        "name": "Construction completing/finishing contractor"
+    },
+    {
+        "id": "130",
+        "name": "Commission/brokers business activities"
+    },
+    {
+        "id": "131",
+        "name": "Domestic trade Agent"
+    },
+    {
+        "id": "132",
+        "name": "Wholesale of cereals"
+    },
+    {
+        "id": "133",
+        "name": "Wholesale of oilseeds"
+    },
+    {
+        "id": "134",
+        "name": "Wholesale of pulses"
+    },
+    {
+        "id": "135",
+        "name": "Wholesale of pepper and spices"
+    },
+    {
+        "id": "136",
+        "name": "Wholesale of fruits & vegetables"
+    },
+    {
+        "id": "137",
+        "name": "Wholesale of Coffee and"
+    },
+    {
+        "id": "138",
+        "name": "Wholesale of plant seed"
+    },
+    {
+        "id": "139",
+        "name": "Wholesale of cut flowers and other plants"
+    },
+    {
+        "id": "140",
+        "name": "Supply of agricultural products"
+    },
+    {
+        "id": "141",
+        "name": "Supply of coffee and tea"
+    },
+    {
+        "id": "142",
+        "name": "Wholesale trade in livestock"
+    },
+    {
+        "id": "143",
+        "name": "Wholesale of and poultry and bird"
+    },
+    {
+        "id": "144",
+        "name": "Wholesale trade in livestock products"
+    },
+    {
+        "id": "145",
+        "name": "Wholesale trade in livestock byproducts"
+    },
+    {
+        "id": "146",
+        "name": "Wholesale of sea food animals"
+    },
+    {
+        "id": "147",
+        "name": "Wholesale trade in agricultural products (except coffee and tea)"
+    },
+    {
+        "id": "148",
+        "name": "Wholesale trade in Coffee and tea"
+    },
+    {
+        "id": "149",
+        "name": "Wholesale trade in animal feed"
+    },
+    {
+        "id": "150",
+        "name": "Wholesale of honey and bee wax"
+    },
+    {
+        "id": "151",
+        "name": "Wholesale trade in crude rubber"
+    },
+    {
+        "id": "152",
+        "name": "Wholesale trade in tobacco and tobacco products"
+    },
+    {
+        "id": "153",
+        "name": "Wholesale trade in food"
+    },
+    {
+        "id": "154",
+        "name": "Wholesale trade in beverages"
+    },
+    {
+        "id": "155",
+        "name": "Wholesale trade in cotton, textile fibers, yarn, textiles and textiles clothing"
+    },
+    {
+        "id": "156",
+        "name": "Wholesale trade in foot wear, leather goods and related products"
+    },
+    {
+        "id": "157",
+        "name": "Wholesalesale of House hold and office equipments, furnitures and furnishings (except electrical equipments)"
+    },
+    {
+        "id": "158",
+        "name": "Wholesale trade in electrical equipments"
+    },
+    {
+        "id": "159",
+        "name": "Wholesalesale of recreational and musical goods"
+    },
+    {
+        "id": "160",
+        "name": "Wholesale of souvenirs, artifacts and artificial jewelry"
+    },
+    {
+        "id": "161",
+        "name": "Wholesale of precious stones, jewelry and silverware"
+    },
+    {
+        "id": "162",
+        "name": "Wholesale trade in stationeries, paper and paper products"
+    },
+    {
+        "id": "163",
+        "name": "Wholesale of sporting goods and equipments (excluding apparel)"
+    },
+    {
+        "id": "164",
+        "name": "Wholesale of photo graphics & visual equipments"
+    },
+    {
+        "id": "165",
+        "name": "Wholesale of equipments and accessories for medical, surgical and bone treatment"
+    },
+    {
+        "id": "166",
+        "name": "Wholesale trade in solid, liquid and gaseous fuels and related products"
+    },
+    {
+        "id": "167",
+        "name": "Wholesale trade in unfinshed nonagricultural intermediate industrial products, waste and scrap products"
+    },
+    {
+        "id": "168",
+        "name": "Wholsale trade in construction materials, hardware, metals, plumbing and heating equipments and supplies"
+    },
+    {
+        "id": "169",
+        "name": "Wholsale of logs and timber"
+    },
+    {
+        "id": "170",
+        "name": "Wholesale trade in chemicals for industrial use"
+    },
+    {
+        "id": "171",
+        "name": "Wholesale trade in chemicals for agricultural"
+    },
+    {
+        "id": "172",
+        "name": "Wholesale trade in chemicals for medical, pharmaceutical and food processing use"
+    },
+    {
+        "id": "173",
+        "name": "Wholesale trade in rubber, plastics and plastic products"
+    },
+    {
+        "id": "174",
+        "name": "Retail trade in cosmetics, perfumery and sanitary articles"
+    },
+    {
+        "id": "175",
+        "name": "Wholesale trade in industrial, agricultural, construction and communication machinery, equipment and accessories"
+    },
+    {
+        "id": "176",
+        "name": "Wholesale trade in communication, computer hardware and peripheral equipment (including accessories)"
+    },
+    {
+        "id": "177",
+        "name": "Wholesale of radiation emitting equipments & radio active sources"
+    },
+    {
+        "id": "178",
+        "name": "Wholesale of medicines, and medical equipments and accessories"
+    },
+    {
+        "id": "179",
+        "name": "Wholesale of veterinary drugs, medical equipments and accessories"
+    },
+    {
+        "id": "180",
+        "name": "Wholesale of legal (commercial)measuring scales, controlling, navigation and precision equipments and accessories"
+    },
+    {
+        "id": "181",
+        "name": "Wholesale of educational equipments"
+    },
+    {
+        "id": "182",
+        "name": "Wholesale of vehicles"
+    },
+    {
+        "id": "183",
+        "name": "Wholesale of vehicles' spare parts and artificial jewelry/décor"
+    },
+    {
+        "id": "184",
+        "name": "Wholesale of vehicles' bodies and trailers"
+    },
+    {
+        "id": "185",
+        "name": "wholesale trade in automotive fuel and lubricants"
+    },
+    {
+        "id": "186",
+        "name": "Department Store (Mall)"
+    },
+    {
+        "id": "187",
+        "name": "Hypermarket"
+    },
+    {
+        "id": "188",
+        "name": "Supermarket"
+    },
+    {
+        "id": "189",
+        "name": "Mini market/"
+    },
+    {
+        "id": "190",
+        "name": "Small shop (Kiosk)"
+    },
+    {
+        "id": "191",
+        "name": "Retail trade in agricultural products"
+    },
+    {
+        "id": "192",
+        "name": "Retail trade in food products"
+    },
+    {
+        "id": "193",
+        "name": "Retail trade in beverage products"
+    },
+    {
+        "id": "194",
+        "name": "Retail trade in vegetables and fruits (including processed)"
+    },
+    {
+        "id": "195",
+        "name": "Retail trade in animal and animal feeds"
+    },
+    {
+        "id": "196",
+        "name": "Retail trade of sanitaryware and cosmetics"
+    },
+    {
+        "id": "197",
+        "name": "Retail trade of pharmaceutical and medical equipments"
+    },
+    {
+        "id": "198",
+        "name": "Retail trade in radiation emitting equipments and radio active sources"
+    },
+    {
+        "id": "199",
+        "name": "Retail trade of pesticides and agricultural chemicals"
+    },
+    {
+        "id": "200",
+        "name": "Retail trade of legal (commercial) measuring scales, controlling, navigation and precision equipments and accessories"
+    },
+    {
+        "id": "201",
+        "name": "Retail trade of laboratory equipments (non medical)"
+    },
+    {
+        "id": "202",
+        "name": "Retail trade of medical equipments and pharmaceutical"
+    },
+    {
+        "id": "203",
+        "name": "Retail trade of education equipments"
+    },
+    {
+        "id": "204",
+        "name": "Retail trade of sportswear and footwear"
+    },
+    {
+        "id": "105",
+        "name": "Retail trade of sporting goods (excluding apparel)"
+    },
+    {
+        "id": "206",
+        "name": "Retail trade of communication devices"
+    },
+    {
+        "id": "207",
+        "name": "Retail trade of photo graphics & visual equipments"
+    },
+    {
+        "id": "208",
+        "name": "Retail trade of equipments and accessories for medical, surgical and bone treatment"
+    },
+    {
+        "id": "209",
+        "name": "Retail trade of entertainment and Musical Equipments"
+    },
+    {
+        "id": "110",
+        "name": "Retail trade of construction"
+    },
+    {
+        "id": "211",
+        "name": "Retail trade of logs and timber"
+    },
+    {
+        "id": "212",
+        "name": "Retail trade of cotton, textile fibers, yarn, textiles and textiles clothing"
+    },
+    {
+        "id": "213",
+        "name": "Retail trade of foot wear, leather and related products"
+    },
+    {
+        "id": "214",
+        "name": "Retail trade of household and office furniture, accessories, and appliances"
+    },
+    {
+        "id": "215",
+        "name": "Retail trade of electrical equipments and related appliances"
+    },
+    {
+        "id": "216",
+        "name": "Retail trade of computer, computer equipments and related appliances"
+    },
+    {
+        "id": "217",
+        "name": "Retail trade of stationery and related products"
+    },
+    {
+        "id": "218",
+        "name": "Retail trade of paper and paper products"
+    },
+    {
+        "id": "219",
+        "name": "Retail trade of precious minerals and Jewelry and silverware items"
+    },
+    {
+        "id": "220",
+        "name": "Retail trade of chemicals for industrial equipment use"
+    },
+    {
+        "id": "221",
+        "name": "Retail trade of chemicals for medical, pharmaceutical and food processing production"
+    },
+    {
+        "id": "222",
+        "name": "Retail trade of rubber, plastics and plastic Products"
+    },
+    {
+        "id": "223",
+        "name": "Retail trade of vehicles"
+    },
+    {
+        "id": "224",
+        "name": "Retail trade of vehicles accessories and décor"
+    },
+    {
+        "id": "225",
+        "name": "Retail trade of vehicles spare parts and trailers"
+    },
+    {
+        "id": "226",
+        "name": "Retail trade of vehicles fuel and lubricants (within fuel Stations)"
+    },
+    {
+        "id": "227",
+        "name": "Retail trade of kerosin and lubricants (with out fuel Stations)"
+    },
+    {
+        "id": "228",
+        "name": "Retail trade of industrial, agricultural and construction machinery and equipments"
+    },
+    {
+        "id": "229",
+        "name": "Maintenance of private household and office furnitures"
+    },
+    {
+        "id": "230",
+        "name": "Maintenance and repair of weapons"
+    },
+    {
+        "id": "231",
+        "name": "Installation and maintenance of electrical equipments"
+    },
+    {
+        "id": "232",
+        "name": "Installation/construction and maintenance of fuel station equipments and biogas plants"
+    },
+    {
+        "id": "233",
+        "name": "Installation and maintenance of green houses including in-side equipments, machines and geomembraine welding"
+    },
+    {
+        "id": "234",
+        "name": "Computer and computer accessories maintenance"
+    },
+    {
+        "id": "235",
+        "name": "Installation and maintenanceof machineries and industrial machineries"
+    },
+    {
+        "id": "236",
+        "name": "Medical equipments installation and maintenance service"
+    },
+    {
+        "id": "237",
+        "name": "Radiation emitting equipments installation, commissioning, and maintenance"
+    },
+    {
+        "id": "238",
+        "name": "Multi-purpose vehicles and parts maintenance"
+    },
+    {
+        "id": "239",
+        "name": "Ships and boats maintenance"
+    },
+    {
+        "id": "240",
+        "name": "Air travel maintenance"
+    },
+    {
+        "id": "241",
+        "name": "Rubber maintenance, clean grease and related services"
+    },
+    {
+        "id": "242",
+        "name": "Star Hotel services"
+    },
+    {
+        "id": "243",
+        "name": "Hotel service"
+    },
+    {
+        "id": "244",
+        "name": "Star restaurant service"
+    },
+    {
+        "id": "245",
+        "name": "Restaurant service"
+    },
+    {
+        "id": "246",
+        "name": "Motel service"
+    },
+    {
+        "id": "247",
+        "name": "lodge service"
+    },
+    {
+        "id": "248",
+        "name": "Guest house service"
+    },
+    {
+        "id": "249",
+        "name": "Cafe and breakfast service"
+    },
+    {
+        "id": "250",
+        "name": "Trade auxiliary"
+    },
+    {
+        "id": "251",
+        "name": "Commercial representative"
+    },
+    {
+        "id": "252",
+        "name": "Import of cereals"
+    },
+    {
+        "id": "253",
+        "name": "Import of oilseeds"
+    },
+    {
+        "id": "254",
+        "name": "Import of Pulses"
+    },
+    {
+        "id": "255",
+        "name": "Import of pepper and spices"
+    },
+    {
+        "id": "256",
+        "name": "Import of Fruits & vegetables"
+    },
+    {
+        "id": "257",
+        "name": "Import of plant seeds"
+    },
+    {
+        "id": "258",
+        "name": "Import of cut flowers and other plant products"
+    },
+    {
+        "id": "259",
+        "name": "Import trade in live animal products (for consumption)"
+    },
+    {
+        "id": "260",
+        "name": "Import trade in animal and animal By products"
+    },
+    {
+        "id": "261",
+        "name": "Import trade in food products"
+    },
+    {
+        "id": "262",
+        "name": "Import trade in beverage products"
+    },
+    {
+        "id": "263",
+        "name": "Import trade in tobacco products"
+    },
+    {
+        "id": "264",
+        "name": "Import trade in processed agricultural products"
+    },
+    {
+        "id": "265",
+        "name": "Import trade in processed coffee"
+    },
+    {
+        "id": "266",
+        "name": "Import trade in incense & gums products"
+    },
+    {
+        "id": "267",
+        "name": "Import trade in bee wax"
+    },
+    {
+        "id": "268",
+        "name": "Import trade in animal"
+    },
+    {
+        "id": "269",
+        "name": "Import trade in crude rubber and fiber products"
+    },
+    {
+        "id": "270",
+        "name": "Import trade in animal feeds raw materials"
+    },
+    {
+        "id": "271",
+        "name": "Import of beverage crops (except coffee and tea)"
+    },
+    {
+        "id": "272",
+        "name": "Import trade intextile, textile fibers, Cotton, thread and apparel"
+    },
+    {
+        "id": "273",
+        "name": "Import trade in leather, leather products and related products"
+    },
+    {
+        "id": "274",
+        "name": "Import of household and office appliances and furnishings"
+    },
+    {
+        "id": "275",
+        "name": "Imports of musical instruments (film, theater and other arts objects)"
+    },
+    {
+        "id": "276",
+        "name": "Imports of hand crafts, souvenir articles, artificial goods and jewelries"
+    },
+    {
+        "id": "277",
+        "name": "Import trade in precious minerals, jewelry and silverware goods"
+    },
+    {
+        "id": "278",
+        "name": "Import trade in stationery materials, paper and paper products"
+    },
+    {
+        "id": "279",
+        "name": "Import of sporting goods and equipments (exccluding apparel)"
+    },
+    {
+        "id": "280",
+        "name": "Import trade in Import trade in coal, coke and briquettes"
+    },
+    {
+        "id": "281",
+        "name": "Import trade in petroleum and petroleum products and related products"
+    },
+    {
+        "id": "282",
+        "name": "Import trade in natural and man-made gas"
+    },
+    {
+        "id": "284",
+        "name": "Import trade in materials, metals and non metals and scraps"
+    },
+    {
+        "id": "285",
+        "name": "Import trade in logs and timber"
+    },
+    {
+        "id": "286",
+        "name": "Import trade in chemicals for Industrial input"
+    },
+    {
+        "id": "287",
+        "name": "Import trade in chemicals for agriculural input"
+    },
+    {
+        "id": "288",
+        "name": "Import trade in chemicals for treatment, medicine and food"
+    },
+    {
+        "id": "289",
+        "name": "Import trade in rubber, plastics and plastic products and batteries"
+    },
+    {
+        "id": "290",
+        "name": "Import trade in cleaning and cosmotics"
+    },
+    {
+        "id": "291",
+        "name": "Import trade in explosives and pyrotechnic products"
+    },
+    {
+        "id": "292",
+        "name": "Import trade in industrial, agricultural and construction machineries, and other related works"
+    },
+    {
+        "id": "293",
+        "name": "Import trade in communication, computer and related equipments"
+    },
+    {
+        "id": "294",
+        "name": "Import of developed software"
+    },
+    {
+        "id": "295",
+        "name": "Import trade in electrical equipments and appliances"
+    },
+    {
+        "id": "296",
+        "name": "Import trade in measurements, testing and navigational equipments"
+    },
+    {
+        "id": "297",
+        "name": "Import trade in education equipments and tools"
+    },
+    {
+        "id": "298",
+        "name": "Import trade in human health medical supplies and equipments"
+    },
+    {
+        "id": "299",
+        "name": "Import trade in animal medical supplies and equipments"
+    },
+    {
+        "id": "300",
+        "name": "Import trade in radiation emitting equipments and radio active sources"
+    },
+    {
+        "id": "300",
+        "name": "Import trade in photographic apparatus, equipments and supplies and optical goods"
+    },
+    {
+        "id": "301",
+        "name": "Other factory products import trade"
+    },
+    {
+        "id": "302",
+        "name": "Import trade in trade in incense"
+    },
+    {
+        "id": "303",
+        "name": "Import trade in candles and tewaf"
+    },
+    {
+        "id": "304",
+        "name": "Importing of vehicles"
+    },
+    {
+        "id": "305",
+        "name": "Importing of vehicles spare parts, regulatory equipments and jewelry/décor supplies"
+    },
+    {
+        "id": "306",
+        "name": "Importing of vehicles' bodies and trailers"
+    },
+    {
+        "id": "307",
+        "name": "Export of cereals"
+    },
+    {
+        "id": "308",
+        "name": "Export of oilseeds"
+    },
+    {
+        "id": "309",
+        "name": "Export of Pulses"
+    },
+    {
+        "id": "310",
+        "name": "Export of pepper and spices"
+    },
+    {
+        "id": "311",
+        "name": "Export of fruits & vegetables"
+    },
+    {
+        "id": "312",
+        "name": "Export of plant seeds"
+    },
+    {
+        "id": "313",
+        "name": "Export of cut flowers and other plant products"
+    },
+    {
+        "id": "314",
+        "name": "Export trade in live animal products (for consumption)"
+    },
+    {
+        "id": "315",
+        "name": "Export trade in live animals and animal By products"
+    },
+    {
+        "id": "316",
+        "name": "Export trade in food products"
+    },
+    {
+        "id": "317",
+        "name": "Export trade in beverage products"
+    },
+    {
+        "id": "318",
+        "name": "Export trade in tobacco products"
+    },
+    {
+        "id": "319",
+        "name": "Export trade in processed coffee and coffee leaves"
+    },
+    {
+        "id": "320",
+        "name": "Export trade in processed agricultural products (except coffee and coffee leaves)"
+    },
+    {
+        "id": "321",
+        "name": "Export of beverage plants (except coffee and tea)"
+    },
+    {
+        "id": "322",
+        "name": "Export of coffee and tea"
+    },
+    {
+        "id": "323",
+        "name": "Export trade in incense and gums"
+    },
+    {
+        "id": "324",
+        "name": "Export of bee wax"
+    },
+    {
+        "id": "325",
+        "name": "Export of animal feeds"
+    },
+    {
+        "id": "326",
+        "name": "Export trade in raw rubber and fiber products"
+    },
+    {
+        "id": "327",
+        "name": "Export of logs and timber"
+    },
+    {
+        "id": "328",
+        "name": "Export of household and office furnitures, appliances, equipments and related utilities"
+    },
+    {
+        "id": "329",
+        "name": "Export trade in textile fibers, cotton, yarn and apparel"
+    },
+    {
+        "id": "330",
+        "name": "Export trade in leather, leather products, footwear and related products"
+    },
+    {
+        "id": "331",
+        "name": "Export trade in minerals and mineral products"
+    },
+    {
+        "id": "332",
+        "name": "Export of musical, recreational, craft and souvenir goods"
+    },
+    {
+        "id": "333",
+        "name": "Export trade in paper and paper products and stationery materials"
+    },
+    {
+        "id": "334",
+        "name": "Export trade in sporting goods"
+    },
+    {
+        "id": "335",
+        "name": "Export trade in coal, coke and briquettes"
+    },
+    {
+        "id": "336",
+        "name": "Export trade in petroleum, petroleum products and related products"
+    },
+    {
+        "id": "337",
+        "name": "Export trade in natural and manmade gas"
+    },
+    {
+        "id": "338",
+        "name": "Export trade in electric power"
+    },
+    {
+        "id": "339",
+        "name": "Export trade in metals, non-metalic, metalic minerals and scraps"
+    },
+    {
+        "id": "340",
+        "name": "export trade in construction materials, iron, plumbing and heating equipments"
+    },
+    {
+        "id": "341",
+        "name": "Export trade in basic chemicals used for industry"
+    },
+    {
+        "id": "342",
+        "name": "Export trade in basic chemicals used for agriculture"
+    },
+    {
+        "id": "343",
+        "name": "Export of chemicals used for medical, manufacture of food and medicine including precursor chemicals"
+    },
+    {
+        "id": "344",
+        "name": "Export trade in raw rubber, tyres, plastics plastic products, battery and dry cells"
+    },
+    {
+        "id": "345",
+        "name": "Export trade in cleaning and cosmotics equipments"
+    },
+    {
+        "id": "346",
+        "name": "Export trade in explosives and pyrotechnic products"
+    },
+    {
+        "id": "347",
+        "name": "Export trade in intermediate products, waste and scraps"
+    },
+    {
+        "id": "348",
+        "name": "Export trade in industrial, agricultural, construction machineries and related machineries and equipments"
+    },
+    {
+        "id": "349",
+        "name": "Export trade in communication, computers, computer peripheral equipments and accessories"
+    },
+    {
+        "id": "350",
+        "name": "Export trade in developed software"
+    },
+    {
+        "id": "351",
+        "name": "Export trade in electrical equipments and accessories"
+    },
+    {
+        "id": "352",
+        "name": "Export trade in scientific measurement, controlling and precision equipments"
+    },
+    {
+        "id": "353",
+        "name": "Export trade in education support equipments"
+    },
+    {
+        "id": "354",
+        "name": "Export trade in radiation emitting equipments and radio active sources"
+    },
+    {
+        "id": "355",
+        "name": "Export of photographic apparatus, equipments and supplies and optical goods"
+    },
+    {
+        "id": "356",
+        "name": "Export trade in Human Medical supplies and equipments"
+    },
+    {
+        "id": "357",
+        "name": "Export trade in Animal Medical supplies and equipments"
+    },
+    {
+        "id": "358",
+        "name": "Export trade in incense"
+    },
+    {
+        "id": "359",
+        "name": "Export trade in candles and tewaf"
+    },
+    {
+        "id": "360",
+        "name": "Export of vehicles"
+    },
+    {
+        "id": "361",
+        "name": "Export of vehicles spare parts, décor supplies and related equipments (including vehicles battery and tyres)"
+    },
+    {
+        "id": "362",
+        "name": "Export of vehicle parts and trailors"
+    },
+    {
+        "id": "363",
+        "name": "Railway and commuter transpot services"
+    },
+    {
+        "id": "364",
+        "name": "Cross-Country Public Transport"
+    },
+    {
+        "id": "365",
+        "name": "Land transport and related services"
+    },
+    {
+        "id": "366",
+        "name": "Transport service by road and dry freight"
+    },
+    {
+        "id": "367",
+        "name": "Transport of cargo trucks"
+    },
+    {
+        "id": "368",
+        "name": "Water transport service"
+    },
+    {
+        "id": "369",
+        "name": "Air transport service"
+    },
+    {
+        "id": "370",
+        "name": "Airports construction and administration works"
+    },
+    {
+        "id": "371",
+        "name": "Operation of roads and toll roads"
+    },
+    {
+        "id": "372",
+        "name": "Tour operation services"
+    },
+    {
+        "id": "373",
+        "name": "Travel agency representation activity"
+    },
+    {
+        "id": "374",
+        "name": "Special event Organization activities"
+    },
+    {
+        "id": "375",
+        "name": "Delegation of ship activities"
+    },
+    {
+        "id": "376",
+        "name": "Freight forwarders and harbour works"
+    },
+    {
+        "id": "377",
+        "name": "Postal and fast carrier service activities"
+    },
+    {
+        "id": "378",
+        "name": "National telecommunication services"
+    },
+    {
+        "id": "379",
+        "name": "Tele center service"
+    },
+    {
+        "id": "380",
+        "name": "Internet café service"
+    },
+    {
+        "id": "381",
+        "name": "Telecommunication inside cable setup, installation and maintenance works"
+    },
+    {
+        "id": "382",
+        "name": "Telecommunication exchange installation and maintenance service"
+    },
+    {
+        "id": "383",
+        "name": "Telecommunication terminal equipments maintenance service"
+    },
+    {
+        "id": "384",
+        "name": "Telecommunication value added service"
+    },
+    {
+        "id": "385",
+        "name": "Customs storage and bonded warehousing service"
+    },
+    {
+        "id": "386",
+        "name": "General Storage and warehousing service"
+    },
+    {
+        "id": "387",
+        "name": "Vehicles parking lots service"
+    },
+    {
+        "id": "388",
+        "name": "Banking service."
+    },
+    {
+        "id": "389",
+        "name": "Saving & credit service associations"
+    },
+    {
+        "id": "390",
+        "name": "Micro finance institutions"
+    },
+    {
+        "id": "391",
+        "name": "Lease financing"
+    },
+    {
+        "id": "392",
+        "name": "Security dealing activities"
+    },
+    {
+        "id": "393",
+        "name": "Discount houses, commercial and other banking services"
+    },
+    {
+        "id": "394",
+        "name": "Life insurance Institutions"
+    },
+    {
+        "id": "395",
+        "name": "Pension funding Institutions"
+    },
+    {
+        "id": "396",
+        "name": "General insurance including life insurance"
+    },
+    {
+        "id": "397",
+        "name": "Reinsurance institutions"
+    },
+    {
+        "id": "398",
+        "name": "Asset valuation activities"
+    },
+    {
+        "id": "399",
+        "name": "Activities auxiliary to pension funding"
+    },
+    {
+        "id": "400",
+        "name": "Activities auxiliary to insurance"
+    },
+    {
+        "id": "401",
+        "name": "Insurance brokering activities"
+    },
+    {
+        "id": "402",
+        "name": "Insurance sales agency activities"
+    },
+    {
+        "id": "403",
+        "name": "Actuary activities"
+    },
+    {
+        "id": "404",
+        "name": "Damages, fixed assets and mobile propertiese stimates activities"
+    },
+    {
+        "id": "405",
+        "name": "Loss Assessing activity"
+    },
+    {
+        "id": "406",
+        "name": "Loss Adjusting activity"
+    },
+    {
+        "id": "407",
+        "name": "Real estate development and distribution into lots activities"
+    },
+    {
+        "id": "408",
+        "name": "Fixed property subletting/renting activities"
+    },
+    {
+        "id": "409",
+        "name": "Inspection service"
+    },
+    {
+        "id": "410",
+        "name": "Laboratory testing service"
+    },
+    {
+        "id": "411",
+        "name": "Product certification service"
+    },
+    {
+        "id": "412",
+        "name": "Management system certification service"
+    },
+    {
+        "id": "413",
+        "name": "Professional certification service"
+    },
+    {
+        "id": "414",
+        "name": "Laboratory calibration service"
+    },
+    {
+        "id": "415",
+        "name": "Verification service"
+    },
+    {
+        "id": "416",
+        "name": "Vehicles technical assessment service"
+    },
+    {
+        "id": "417",
+        "name": "Renting service of machineries and equipments"
+    },
+    {
+        "id": "418",
+        "name": "Computer network design and cable installation"
+    },
+    {
+        "id": "419",
+        "name": "Data base activities and Data processing"
+    },
+    {
+        "id": "420",
+        "name": "Software installation, commissioning and erection activity"
+    },
+    {
+        "id": "421",
+        "name": "Data center (hosting) services"
+    },
+    {
+        "id": "422",
+        "name": "Authorized Accountant"
+    },
+    {
+        "id": "423",
+        "name": "Authorized Auditor"
+    },
+    {
+        "id": "424",
+        "name": "Management consultancy services"
+    },
+    {
+        "id": "425",
+        "name": "Consultancy service for tax and finance"
+    },
+    {
+        "id": "426",
+        "name": "Consultancy service for social affairs"
+    },
+    {
+        "id": "427",
+        "name": "Consultancy service for economic development, business and Investment"
+    },
+    {
+        "id": "428",
+        "name": "Consultancy service for food security"
+    },
+    {
+        "id": "429",
+        "name": "Media Consultancy Service."
+    },
+    {
+        "id": "430",
+        "name": "Hotel and tourism consultancy service"
+    },
+    {
+        "id": "431",
+        "name": "Art and culture onsultancy service"
+    },
+    {
+        "id": "432",
+        "name": "Consultancy service on education"
+    },
+    {
+        "id": "433",
+        "name": "Quality Management system Consultancy"
+    },
+    {
+        "id": "434",
+        "name": "Consultancy service on ocupational safty and health control service"
+    },
+    {
+        "id": "435",
+        "name": "Health consultancy service"
+    },
+    {
+        "id": "436",
+        "name": "Environmental auditing and environmental protection consultancy service"
+    },
+    {
+        "id": "437",
+        "name": "Agro ecosystem development consultancy service"
+    },
+    {
+        "id": "438",
+        "name": "Consultancy service on coffee, tea and spices treatment and improvement activities"
+    },
+    {
+        "id": "439",
+        "name": "Consultancy service on nutrition"
+    },
+    {
+        "id": "440",
+        "name": "Consultancy service on food and beverages preparation"
+    },
+    {
+        "id": "441",
+        "name": "Consultancy service on sport science"
+    },
+    {
+        "id": "442",
+        "name": "Consultancy service on construction works"
+    },
+    {
+        "id": "443",
+        "name": "Consultancy service on urban planning and related activities"
+    },
+    {
+        "id": "444",
+        "name": "Consultancy service on electical engineering"
+    },
+    {
+        "id": "445",
+        "name": "Consultancy service on mechanical engineering"
+    },
+    {
+        "id": "446",
+        "name": "Consultancy service on mining engineering"
+    },
+    {
+        "id": "447",
+        "name": "Consultancy service on chemical engineering"
+    },
+    {
+        "id": "448",
+        "name": "Consultancy service on water Works"
+    },
+    {
+        "id": "449",
+        "name": "Consultancy service metrology"
+    },
+    {
+        "id": "450",
+        "name": "Consultancy service on information and communication technology"
+    },
+    {
+        "id": "451",
+        "name": "Consultancy service on scientific machineries selection, installation, commissioning, maintenance and disposal"
+    },
+    {
+        "id": "452",
+        "name": "Consultancy service on petroleum products"
+    },
+    {
+        "id": "453",
+        "name": "Consultancy service on maritime"
+    },
+    {
+        "id": "454",
+        "name": "Consultancy service on aviation"
+    },
+    {
+        "id": "455",
+        "name": "Consultancy service on land transport (car)"
+    },
+    {
+        "id": "456",
+        "name": "Consultancy on geoinformation product and services"
+    },
+    {
+        "id": "457",
+        "name": "Consultancy activity on advertising"
+    },
+    {
+        "id": "458",
+        "name": "Newspapers, journals and related periodicals distribution activities"
+    },
+    {
+        "id": "459",
+        "name": "Local labor recruitment and linkage activities"
+    },
+    {
+        "id": "460",
+        "name": "Abroad labor recruitment and linkage activities"
+    },
+    {
+        "id": "461",
+        "name": "Security and claning service"
+    },
+    {
+        "id": "462",
+        "name": "Geospatial (earth information) service"
+    },
+    {
+        "id": "463",
+        "name": "international bids (restricted to the specific won bid)"
+    },
+    {
+        "id": "464",
+        "name": "Services of pre-primary education and after-school centre"
+    },
+    {
+        "id": "465",
+        "name": "Services of primary and secondary education"
+    },
+    {
+        "id": "466",
+        "name": "Services of cross boundary higher education"
+    },
+    {
+        "id": "467",
+        "name": "Services of education by technical colleges and technical institutions"
+    },
+    {
+        "id": "468",
+        "name": "Services of short-term technical education and training (TVET)"
+    },
+    {
+        "id": "469",
+        "name": "Services of regular higher education"
+    },
+    {
+        "id": "470",
+        "name": "Services of driver's qualification certification (In formal education and specialized mobile machines)"
+    },
+    {
+        "id": "471",
+        "name": "Services of theater, music, film, modeling, dance, video and photograph, design works etc)"
+    },
+    {
+        "id": "472",
+        "name": "Services on circus training"
+    },
+    {
+        "id": "473",
+        "name": "Training service in maritime"
+    },
+    {
+        "id": "474",
+        "name": "Training service in aviation"
+    },
+    {
+        "id": "475",
+        "name": "Specialized hospital service"
+    },
+    {
+        "id": "476",
+        "name": "General hospital service"
+    },
+    {
+        "id": "477",
+        "name": "Primary hospital service"
+    },
+    {
+        "id": "478",
+        "name": "Diagnostic imaging service"
+    },
+    {
+        "id": "478",
+        "name": "Diagnostic laboratory service"
+    },
+    {
+        "id": "480",
+        "name": "Clinics and supplementary health care services"
+    },
+    {
+        "id": "481",
+        "name": "Nursing services"
+    },
+    {
+        "id": "482",
+        "name": "Specialty clinic service"
+    },
+    {
+        "id": "483",
+        "name": "Middle clinic service"
+    },
+    {
+        "id": "484",
+        "name": "Primary clinic service"
+    },
+    {
+        "id": "485",
+        "name": "Child day care service"
+    },
+    {
+        "id": "486",
+        "name": "Veterinary activities"
+    },
+    {
+        "id": "487",
+        "name": "Traditional (cultural) medical service"
+    },
+    {
+        "id": "488",
+        "name": "Medical and social welfare support services"
+    },
+    {
+        "id": "489",
+        "name": "Motion picture (movie), films, theatre, video and related works video recording, production and distribution activities"
+    },
+    {
+        "id": "490",
+        "name": "Motion picture (movie), films, theatre, video and related works display activities"
+    },
+    {
+        "id": "491",
+        "name": "Trade on Broadcast  services"
+    },
+    {
+        "id": "492",
+        "name": "Activities of of radio and television programs production and distribution"
+    },
+    {
+        "id": "493",
+        "name": "Activities of media entertainment production and distribution programs"
+    },
+    {
+        "id": "494",
+        "name": "Activities of sports and other entertainments Preparation and display"
+    },
+    {
+        "id": "495",
+        "name": "Body enrichment sports services (such as circus)"
+    },
+    {
+        "id": "496",
+        "name": "Servic on musical instruments playing (such as DJs)"
+    },
+    {
+        "id": "497",
+        "name": "Studio recording service"
+    },
+    {
+        "id": "498",
+        "name": "Picture, sculpture, gallery/studio service"
+    },
+    {
+        "id": "499",
+        "name": "Music and band activities"
+    },
+    {
+        "id": "500",
+        "name": "Films and theatre Production and Related"
+    },
+    {
+        "id": "501",
+        "name": "Wildlife taxidermy commercial activities"
+    },
+    {
+        "id": "502",
+        "name": "Various wildlife products trade"
+    },
+    {
+        "id": "503",
+        "name": "Bookstore and library activities"
+    },
+    {
+        "id": "504",
+        "name": "Museum works"
+    },
+    {
+        "id": "505",
+        "name": "Historic cites and buildings for recreation and care services"
+    },
+    {
+        "id": "506",
+        "name": "Men’s hairdressing service"
+    },
+    {
+        "id": "507",
+        "name": "Ladies’ hairdressing service"
+    },
+    {
+        "id": "508",
+        "name": "Laundry service"
+    },
+    {
+        "id": "509",
+        "name": "Shower service"
+    },
+    {
+        "id": "510",
+        "name": "Bath & massage service"
+    },
+    {
+        "id": "511",
+        "name": "Translation, secretarial and other related services"
+    },
+    {
+        "id": "512",
+        "name": "Different events decorating activities"
+    },
+    {
+        "id": "513",
+        "name": "Funeral execution and related activities"
+    },
+    {
+        "id": "514",
+        "name": "Grain mill service"
+    },
+    {
+        "id": "515",
+        "name": "Residential pesticides spraying service"
+    },
+    {
+        "id": "516",
+        "name": "Tailoring service"
+    },
+    {
+        "id": "517",
+        "name": "Scale and balance service"
+    },
+    {
+        "id": "518",
+        "name": "Water and lighting fees collection delegating service"
+    },
+    {
+        "id": "519",
+        "name": "Load and unload service"
+    }
+]

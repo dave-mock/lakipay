@@ -1,0 +1,150 @@
+package main
+
+import (
+	"crypto/rand"
+	"crypto/rsa"
+	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"github.com/adrinicomartin/keystore-go"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+)
+
+type AHBPayload struct {
+	Sub string  `json:"sub"`
+	ISS string  `json:"iss"`
+	Aud string  `json:"aud"`
+	Exp float64 `json:"exp"`
+	Iat float64 `json:"iat"`
+	Jti string  `json:"jti"`
+}
+
+var jwtToken string
+var expTime int = 30
+var nowMillis int64 = time.Now().Unix()
+var expMillis int64 = (time.Now().Unix()) + int64(expTime*60*1000)
+
+func main() {
+	fmt.Println("TST Code")
+	ks := readKeyStore("./IntellectARXSJWT.jks", []byte("Intellect01"))
+	fmt.Println(ks)
+	fmt.Println(ks["intellect"].(*keystore.PrivateKeyEntry).PrivKey)
+
+	// var key = ks["intellect"].(*keystore.PrivateKeyEntry).PrivKey
+
+	key, err := rsa.GenerateKey(rand.Reader, 1000)
+
+	////////////////////////////////
+	///
+	/// Modulus
+	///
+	/// 20375042521074875197799354307811332031468261837766789068565696721723395562490652736680021775837723984005024134314486881134618234170326175980784290865763118976889839385010686666663820066353262696808512728770736176596488113468341317859103363969373434521422227755260093667322903627764603626648432335263473498128042813248520452713943017480664501682586710837020016092575350224891977914471767737254600865080388595821510563238556459548946010229719004036294117160194556906121519680932264732083050328367465711800812893721787499390121429359824711489530480963835775383052111313545348827920887382672780649903678231092333704467859
+	///
+	/// D
+	///
+	/// 4984559206866250729302791516504250827174430353005400447629794094013934129627731439144159621771003076667417671627693793814659416031445436615956094045360332126226021863373000584808902255578403967498220617061830921759792085741457746757327986244731438358209295170668249717994234003142497977418165549709008202930898956979951819241258679681889086917025690446763335954209824128473667999421577398224045586541994127475479700517490185693303113702250648775834582815625696606264018534779557749916793232351596131126904039847879706286164795964363820810054615974393893475688871506864942472338811078203738878358459536521656996824809
+	///
+	////////////////////////////////
+
+	key1 := &rsa.PrivateKey{
+		PublicKey: rsa.PublicKey{
+			N: key.PublicKey.N,
+			E: key.PublicKey.E,
+		},
+		D:      key.D,
+		Primes: key.Primes,
+	}
+
+	fmt.Println("key1")
+	fmt.Println("N")
+	fmt.Println(key1.N)
+	fmt.Println("E")
+	fmt.Println(key1.E)
+	fmt.Println("D")
+	fmt.Println(key1.D)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var t = jwt.NewWithClaims(jwt.SigningMethodRS256,
+		jwt.MapClaims{
+			"sub": "intellect",
+			"iss": "intellect",
+			"aud": "default",
+			"exp": expMillis / 1000,
+			"iat": nowMillis / 1000,
+			"jti": uuid.NewString(),
+		})
+
+	t.Header = map[string]interface{}{
+		"alg": "RS256",
+		"typ": "JWT",
+	}
+
+	s, err := t.SignedString(key1)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("TOKEN")
+	fmt.Println(s)
+
+}
+
+func readKeyStore(filename string, password []byte) keystore.KeyStore {
+	f, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	keyStore, err := keystore.Decode(f, password)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return keyStore
+}
+
+// getPrivateKey returns a private key from a key store file
+
+// func getPrivateKey() (privateKey crypto.PrivateKey, err error) {
+// 	// initialize the private key to nil
+// 	privateKey = nil
+// 	// define the key store path, password, and alias
+// 	keyStorePath := "./IntellectARXSJWT.jks"
+// 	keyPassword := "Intellect01"
+// 	keyAlias := "intellect"
+
+// 	// open the key store file
+// 	file, err := os.Open(keyStorePath)
+// 	if err != nil {
+// 		// return the error if the file cannot be opened
+// 		return
+// 	}
+// 	// defer closing the file
+// 	defer file.Close()
+// 	// create a key store object
+// 	ks := keystore.New()
+// 	// load the key store from the file
+// 	err = ks.Load(file, []byte(keyPassword))
+// 	if err != nil {
+// 		// return the error if the key store cannot be loaded
+// 		return
+// 	}
+// 	// get the key entry from the key store by the alias and the password
+// 	keyEntry, ok := ks.GetPrivateKeyEntry(keyAlias, []byte(keyPassword))
+// 	if !ok {
+// 		// return an error if the key entry cannot be found
+// 		err = errors.New("key entry not found")
+// 		return
+// 	}
+// 	// get the private key from the key entry
+// 	privateKey = keyEntry.PrivKey
+// 	// return the private key and nil error
+// 	return
+// }
