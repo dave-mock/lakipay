@@ -17,6 +17,7 @@ func (uc Usecase) GetUserAccounts(id uuid.UUID) ([]entity.Account, error) {
 
 	// Find Accounts
 	accs, err := uc.repo.FindAccountsByUserId(id)
+
 	if err != nil {
 		print(err)
 		return nil, Error{

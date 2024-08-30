@@ -4,6 +4,7 @@ import (
 	"auth/src/pkg/auth/core/entity"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -125,7 +126,7 @@ func (repo PsqlRepo) StorePhoneAuth(phoneAuth entity.PhoneAuth) error {
 	_, err := repo.db.Exec(fmt.Sprintf(`
 	INSERT INTO %s.phone_auths (id, token, phone_id, code, method, status, created_at)
 	VALUES ($1::UUID, $2, $3::UUID, $4, $5, $6, $7);
-	`, repo.schema), phoneAuth.Id, phoneAuth.Token, phoneAuth.Phone.Id, phoneAuth.Code, phoneAuth.Method, phoneAuth.Status, phoneAuth.CreatedAt)
+	`, repo.schema), phoneAuth.Id, phoneAuth.Token, phoneAuth.Phone.Id, phoneAuth.Code, phoneAuth.Method, phoneAuth.Status, time.Now())
 
 	return err
 }
@@ -133,6 +134,8 @@ func (repo PsqlRepo) StorePhoneAuth(phoneAuth entity.PhoneAuth) error {
 func (repo PsqlRepo) FindPhoneAuth(token string) (entity.PhoneAuth, error) {
 
 	var phoneAuth entity.PhoneAuth
+
+	fmt.Println("||||||||||||||||||| ", token)
 
 	err := repo.db.QueryRow(fmt.Sprintf(`
 	SELECT phone_auths.id, phone_auths.token, 
@@ -144,6 +147,27 @@ func (repo PsqlRepo) FindPhoneAuth(token string) (entity.PhoneAuth, error) {
 	`, repo.schema, repo.schema, repo.schema), token).Scan(
 		&phoneAuth.Id, &phoneAuth.Token,
 		&phoneAuth.Phone.Id, &phoneAuth.Phone.Prefix, &phoneAuth.Phone.Number,
+		&phoneAuth.Code, &phoneAuth.Method, &phoneAuth.Status,
+	)
+
+	return phoneAuth, err
+}
+
+func (repo PsqlRepo) FindPhoneAuthWithoutPhone(token string) (entity.PhoneAuth, error) {
+
+	var phoneAuth entity.PhoneAuth
+
+	fmt.Println("||||||||||||||||||| ", token)
+
+	err := repo.db.QueryRow(fmt.Sprintf(`
+	SELECT phone_auths.id, phone_auths.token, 
+		phone_auths.code, phone_auths.method, phone_auths.status
+	FROM %s.phone_auths
+	WHERE token = $1
+	order by created_at DESC
+	limit 1
+	`, repo.schema), token).Scan(
+		&phoneAuth.Id, &phoneAuth.Token,
 		&phoneAuth.Code, &phoneAuth.Method, &phoneAuth.Status,
 	)
 

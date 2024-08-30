@@ -8,6 +8,7 @@ import (
 
 type Interactor interface {
 	// Bank
+	UpdateUserUsecase(users entity.User2) (entity.User2, error)
 	AddBank(name, shortName, bin, swiftCode, logo string) (*entity.Bank, error)
 	GetBanks() ([]entity.Bank, error)
 	/// Accounts
@@ -30,14 +31,32 @@ type Interactor interface {
 	// 	amount float64,
 	// )
 
-	CreateTransaction(userId uuid.UUID, from uuid.UUID, to uuid.UUID, amount float64, txnType string, token string) (*entity.Transaction, error)
-	VerifyTransaction(userId, txnId uuid.UUID, code string, amount float64) (*entity.Transaction, error)
+	CreateRegisterKeys(id uuid.UUID, username string, password string) (string, error)
+	CreateHostedTransactionInitiate(amount float64, currency string, callback_url string, secretKey string, stringData string, token string) (interface{}, error)
+
+	CreateTransactionInitiate(userId uuid.UUID, from uuid.UUID, to uuid.UUID, amount float64, medium entity.TransactionMedium, txnType string, token string, detail string) (interface{}, error)
+	CreateTransaction(userId uuid.UUID, from uuid.UUID, to uuid.UUID, amount float64, txnType string, token string, challenge_type string, challenge entity.TransactionChallange) (*entity.Transaction, error)
+	// VerifyTransaction(userId, txnId uuid.UUID, code string, amount float64) (*entity.Transaction, error)
 	GetUserTransactions(id uuid.UUID) ([]entity.Transaction, error)
 	GetAllTransactions() ([]entity.Transaction, error)
 	TransactionsDashboardUsecase(year int) (interface{}, error)
+
 	// GetUserTransactions(userId uuid.UUID) ([]entity.Transaction, error)
 
 	// Verify Bank Account
 	VerifyAccount(userId, accountId uuid.UUID, method string, details interface{}, code string) (string, error)
 	DeleteAccount(userId, accId uuid.UUID) error
+
+	SendOtpUsecase(userId uuid.UUID) (string, error)
+	SendSetFIngerPrintUsecase(userId uuid.UUID, data interface{}) (string, error)
+	SendGenerateChallenge(id uuid.UUID, deviceId string) (string, error)
+	GetverifySignature(id uuid.UUID, challenge string, sign string) (string, error)
+	GetstorePublicKeyHandler(key string, id uuid.UUID, device string) (string, error)
+
+	InitPreSession(txtId uuid.UUID) (entity.TransactionSession, error)
+	VerifyTransaction(UserId uuid.UUID, token string, transactionChallenges entity.TransactionChallange, challengeType string) (string, error)
+
+	GetApiKeysUsecase(id uuid.UUID) (string, error)
+	ApplyForTokenUsecase(username string, password string) (string, error)
+	CheckBalance(from uuid.UUID) (float64, error)
 }

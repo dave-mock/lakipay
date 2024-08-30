@@ -42,16 +42,18 @@ func AesEncrption(plaintext string) (string, error) {
 	return str, nil
 }
 
+
 func AesDecription(encrypted string) (string, error) {
 	key := "my32digitkey12345678901234567890"
 	iv := "my16digitIvKey12"
 
-	fmt.Print("||||| encrpt", encrypted)
 	ciphertext, err := base64.StdEncoding.DecodeString(encrypted)
+
 
 	if err != nil {
 		return "", err
 	}
+
 
 	block, err := aes.NewCipher([]byte(key))
 
@@ -69,6 +71,8 @@ func AesDecription(encrypted string) (string, error) {
 
 	return string(ciphertext), nil
 }
+
+
 func PKCS5UnPadding(src []byte) []byte {
 	fmt.Println("||||||||| len ", len(src))
 	length := len(src)

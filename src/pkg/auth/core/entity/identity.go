@@ -17,12 +17,14 @@ type PhoneIdentity struct {
 }
 
 type PasswordIdentity struct {
-	Id        uuid.UUID
-	User      User
-	Password  string
-	Hint      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Id             uuid.UUID
+	User           User
+	Password       string
+	Hint           string
+	FacePassword   string
+	FingerPassword string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 // [TODO] - will go on

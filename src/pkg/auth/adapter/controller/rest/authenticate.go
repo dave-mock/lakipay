@@ -53,6 +53,7 @@ func (controller Controller) GetInitAuth(w http.ResponseWriter, r *http.Request)
 		Agent: "agent",
 	}
 
+
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&req.Phone)
 	if err != nil {

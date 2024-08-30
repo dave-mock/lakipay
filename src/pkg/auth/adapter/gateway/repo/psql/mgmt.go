@@ -25,6 +25,7 @@ func (repo PsqlRepo) StoreUser(user entity.User) error {
 }
 
 func (repo PsqlRepo) StorePhoneIdentity(phoneIdentity entity.PhoneIdentity) error {
+
 	_, err := repo.db.Exec(fmt.Sprintf(`
 	INSERT INTO %s.phone_identities (id, "user_id", phone_id, created_at)
 	VALUES ($1::UUID, $2::UUID, $3::UUID, $4);
@@ -70,16 +71,22 @@ func (repo PsqlRepo) FindUserUsingPhoneIdentity(phoneId uuid.UUID) (*entity.User
 }
 
 func (repo PsqlRepo) FindUserById(id uuid.UUID) (*entity.User, error) {
-	var user *entity.User
+	var user entity.User
 
 	var sirName sql.NullString
 	var lastName sql.NullString
+	fmt.Println("################################################### , repo 1", id)
+	sqlStmt := `SELECT id, sir_name, first_name, last_name, created_at
+	FROM auth.users
+	WHERE id = $1;
+	`
 
-	err := repo.db.QueryRow(fmt.Sprintf(`
-	SELECT id, sir_name, first_name, last_name, created_at
-	FROM %s.users
-	WHERE id = $1::UUID;
-	`, repo.schema), id).Scan(user.Id, &sirName, user.FirstName, &lastName, user.CreatedAt)
+	err := repo.db.QueryRow(sqlStmt, id).Scan(&user.Id, &sirName, &user.FirstName, &lastName, &user.CreatedAt)
+	if err != nil {
+		fmt.Println((err))
+		return &entity.User{}, nil
+	}
+	fmt.Println("################################################### , repo 10")
 
 	if sirName.Valid {
 		user.SirName = sirName.String
@@ -88,8 +95,9 @@ func (repo PsqlRepo) FindUserById(id uuid.UUID) (*entity.User, error) {
 	if lastName.Valid {
 		user.LastName = lastName.String
 	}
+	fmt.Println("################################################### , repo 2")
 
-	return user, err
+	return &user, nil
 }
 
 func (repo PsqlRepo) StorePasswordIdentity(passwordIdentity entity.PasswordIdentity) error {
@@ -97,6 +105,21 @@ func (repo PsqlRepo) StorePasswordIdentity(passwordIdentity entity.PasswordIdent
 	INSERT INTO %s.password_identities (id, "user_id", password, hint, created_at)
 	VALUES ($1::UUID, $2::UUID, $3, $4, $5);
 	`, repo.schema), passwordIdentity.Id, passwordIdentity.User.Id, passwordIdentity.Password, sql.NullString{String: passwordIdentity.Hint, Valid: passwordIdentity.Hint != ""}, passwordIdentity.CreatedAt)
+
+	return err
+}
+func (repo PsqlRepo) UpdatePasswordIdentity(password string, userId uuid.UUID) error {
+	fmt.Println("|||||||||||| 0000 ", password)
+	fmt.Println("|||||||||||| 0000 ", userId)
+
+	_, err := repo.db.Exec(fmt.Sprintf(`
+	
+
+	UPDATE %s.password_identities
+		SET finger_password = CASE WHEN $1 <> '' THEN $1 ELSE finger_password END
+		WHERE user_id = $2;
+
+	`, repo.schema), password, userId)
 
 	return err
 }

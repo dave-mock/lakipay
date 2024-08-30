@@ -14,6 +14,7 @@ const (
 	SALE          TransactionType = "SALE"
 	BILL_PAYMENT  TransactionType = "BILL_PAYMENT"
 	SETTLEMENT    TransactionType = "SETTLEMENT"
+	BILL          TransactionType = "BILL_AIRTIME"
 )
 
 type TransactionMedium string
@@ -48,11 +49,33 @@ type Transaction struct {
 	Status            string
 	Description       string
 	Token             string
+	Amount            float64
+	HasChallenge      bool
+	TotalAmount       float64
+	Currency          string
+	Phone             string
+}
+
+type TransactionChallange struct {
+	TwoFA     string `json:"2fa"`
+	Challenge string `json:"challenge"`
+	OTP       string `json:"otp"`
+	Signature string `json:"signature"`
 }
 
 type Replenishment struct {
 	Amount float64
 }
+
+type MerchantKeys struct {
+	Id         uuid.UUID
+	PublickKey string
+	PrivateKey string
+	MerchantId uuid.UUID
+	Username   string
+	Password   string
+}
+
 type P2p struct {
 	Amount float64
 }
@@ -73,4 +96,22 @@ type BatchTransaction struct {
 	TTL          int64
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+}
+
+type PublicKey struct {
+	ID        uuid.UUID `db:"id"`
+	UserID    uuid.UUID `db:"user_id"`
+	PublicKey string    `db:"public_key"`
+	DeviceID  string    `db:"device_id"`
+	Challenge string    `db:"challenge"`
+	ExpiresAt time.Time `db:"expires_at"`
+	Used      bool      `db:"used"`
+	CreatedAt time.Time `db:"created_at"`
+}
+
+type TransactionSession struct {
+	Id        uuid.UUID
+	Token     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

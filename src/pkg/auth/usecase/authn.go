@@ -649,7 +649,7 @@ func (uc Usecase) CreateSession(token string) (*entity.Session, string, error) {
 func (uc Usecase) CheckSession(token string) (*entity.Session, error) {
 
 	// Check session token
-	fmt.Println("||| check session")
+	fmt.Println("||||||||||||||||||||||||| check session")
 	pld, err := jwt.Decode(token, "active")
 	if err != nil {
 		return nil, Error{
@@ -683,6 +683,7 @@ func (uc Usecase) CheckSession(token string) (*entity.Session, error) {
 // Get User
 func (uc Usecase) GetUserById(id uuid.UUID) (*entity.User, error) {
 	var user *entity.User
+	fmt.Println("################################################### , usecase")
 
 	user, err := uc.repo.FindUserById(id)
 

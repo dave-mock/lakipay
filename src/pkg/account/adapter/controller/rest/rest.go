@@ -24,7 +24,61 @@ func New(log *log.Logger, interactor usecase.Interactor, sm *http.ServeMux, auth
 
 	// Accounts
 
-	fmt.Println("||||||| controller")
+	sm.HandleFunc("/user-update", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			{
+				controller.UpdateUser(w, r)
+			}
+		}
+	})
+
+	sm.HandleFunc("/send-otp", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			{
+				controller.GetSendOtp(w, r)
+			}
+		}
+	})
+
+	sm.HandleFunc("/finger-print", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPatch:
+			{
+				controller.GetSetFingerPrint(w, r)
+			}
+		}
+	})
+	sm.HandleFunc("/generate-challenge", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			{
+				controller.GetGenerateChallenge(w, r)
+			}
+
+		}
+	})
+
+	sm.HandleFunc("/verify-signature", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+
+		case http.MethodPost:
+			{
+				controller.GetVerifySignatureHandler(w, r)
+			}
+		}
+	})
+
+	sm.HandleFunc("/store-public-key", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			{
+				controller.GetstorePublicKeyHandler(w, r)
+			}
+		}
+	})
+
 	sm.HandleFunc("/accounts", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("||||||||||||||| /accounts")
 		switch r.Method {
@@ -74,7 +128,7 @@ func New(log *log.Logger, interactor usecase.Interactor, sm *http.ServeMux, auth
 
 	// // Transactions
 	sm.HandleFunc("/accounts/transactions", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("||||| transactions one")
+		fmt.Println("||||| tsransactions one")
 		switch r.Method {
 		case http.MethodGet:
 			{
@@ -85,6 +139,96 @@ func New(log *log.Logger, interactor usecase.Interactor, sm *http.ServeMux, auth
 				controller.GetRequestTransaction(w, r)
 			}
 		}
+	})
+
+	sm.HandleFunc("/accounts/balance", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+
+		case http.MethodPost:
+			{
+				controller.GetCheckBalanceApi(w, r)
+			}
+		}
+	})
+
+	sm.HandleFunc("/accounts/apply-for-token", func(w http.ResponseWriter, r *http.Request) {
+
+		switch r.Method {
+
+		case http.MethodPost:
+			{
+				controller.GetApplyForToken(w, r)
+			}
+		}
+	})
+
+	sm.HandleFunc("/accounts/transactions-keys", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("||||| transactions one")
+		switch r.Method {
+
+		case http.MethodPost:
+			{
+				controller.GetRegisterKeys(w, r)
+			}
+		case http.MethodGet:
+			{
+				controller.GetApiKeys(w, r)
+			}
+		}
+	})
+
+	sm.HandleFunc("/accounts/transactions-hosted-intiate", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("||||| transactions one")
+		switch r.Method {
+
+		case http.MethodPost:
+			{
+				controller.GetRequestHostedTransactionInitiate(w, r)
+			}
+
+		}
+	})
+
+	sm.HandleFunc("/accounts/transactions-hosted", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("||||| transactions one")
+		switch r.Method {
+
+		case http.MethodPost:
+			{
+				// controller.CompleteTransaction(w, r)
+				controller.GetVerifyTransactionHosted(w, r)
+			}
+		case http.MethodGet:
+			{
+				controller.GetTransactionDetails(w, r)
+			}
+		}
+	})
+
+	sm.HandleFunc("/accounts/transactions-intiate", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("||||| transactions one")
+		switch r.Method {
+
+		case http.MethodPost:
+			{
+				controller.GetRequestTransactionInitiate(w, r)
+			}
+		}
+	})
+	sm.HandleFunc("/accounts/transactions-intiate-hosted", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("||||| transactions two")
+		switch r.Method {
+
+		case http.MethodPost:
+			{
+				controller.GetRequestTransactionInitiateForHosted(w, r)
+			}
+		}
+	})
+
+	sm.HandleFunc("/accounts/transactions-varify", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("|||||| trnsaaction varify")
+		controller.GetVerifyTransaction(w, r)
 	})
 	sm.HandleFunc("/accounts/transactions-dashboard", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("||||| transactions one")

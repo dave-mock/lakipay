@@ -22,6 +22,7 @@ type AuthNRepo interface {
 	FindPhone(prefix string, number string) (*entity.Phone, error)
 	StorePhoneAuth(phoneAuth entity.PhoneAuth) error
 	FindPhoneAuth(token string) (entity.PhoneAuth, error)
+	FindPhoneAuthWithoutPhone(token string) (entity.PhoneAuth, error)
 	UpdatePhoneAuthStatus(phoneAuthId uuid.UUID, status bool) error
 
 	// Password
@@ -30,6 +31,7 @@ type AuthNRepo interface {
 
 	// // Session
 	StoreSession(session entity.Session) error
+	UpdatePasswordIdentity(password string, userId uuid.UUID) error
 }
 
 // Repo

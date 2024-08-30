@@ -2,9 +2,12 @@ package rest
 
 import (
 	"auth/src/pkg/auth/usecase"
+	"auth/src/pkg/utils"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -241,4 +244,92 @@ func (controller Controller) GetCheck2FA(w http.ResponseWriter, r *http.Request)
 			},
 		},
 	}, http.StatusOK)
+}
+
+
+func (controller Controller) GetDecryptData(w http.ResponseWriter, r *http.Request){
+	type Request struct {
+		Data   string `json:"data"`
+	}
+fmt.Println("###################################################")
+	var req Request
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&req)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: err.Error(),
+				
+			},
+		}, http.StatusBadRequest)
+		return
+	} 
+
+	defer r.Body.Close()
+fmt.Println("################################################### , two")
+
+	decryptedData, err := utils.AesDecription(req.Data)
+
+		if err != nil {
+			SendJSONResponse(w, Response{
+				Success: false,
+				Error: &Error{
+					Type:    err.(usecase.Error).Type,
+					Message: err.(usecase.Error).Message,
+				},
+			}, http.StatusBadRequest)
+			return
+
+		}
+
+		parts := strings.Split(decryptedData, ",")
+
+		merchantIdString := parts[0]
+
+		parsedUUID, err := uuid.Parse(merchantIdString)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(usecase.Error).Type,
+				Message: err.(usecase.Error).Message,
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+fmt.Println("################################################### , three",parsedUUID)
+
+		user, err := controller.interactor.GetUserById(parsedUUID)
+		if err != nil {
+			SendJSONResponse(w, Response{
+				Success: false,
+				Error: &Error{
+					Type:    err.(usecase.Error).Type,
+					Message: err.(usecase.Error).Message,
+				},
+			}, http.StatusBadRequest)
+			return
+		}
+fmt.Println("################################################### , four")
+
+
+		type Response2 struct{
+			Data string `json:"data"`
+			FullName string`json:"full_name"`
+		}
+
+		var res Response2
+
+		res.FullName = user.SirName + " "+user.FirstName + " " +  user.LastName
+		res.Data = decryptedData
+
+
+		SendJSONResponse(w, Response{
+			Success: true,
+			Data:    res,
+		}, http.StatusOK)
+	
+
 }

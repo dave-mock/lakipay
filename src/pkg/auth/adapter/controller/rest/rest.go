@@ -1,8 +1,10 @@
 package rest
 
 import (
+	auth "auth/src/pkg/auth/adapter/controller/procedure"
 	"auth/src/pkg/auth/usecase"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -21,6 +23,7 @@ func (err Error) Error() string {
 type Controller struct {
 	log        *log.Logger
 	interactor usecase.Interactor
+	auth       auth.Controller
 	sm         *http.ServeMux
 }
 
@@ -83,6 +86,18 @@ func New(log *log.Logger, sm *http.ServeMux, interactor usecase.Interactor) Cont
 		case http.MethodPost:
 			{
 				controller.GetSet2FA(w, r)
+			}
+		}
+	})
+
+	sm.HandleFunc("/get-decrypt-data", func(w http.ResponseWriter, r *http.Request) {
+		
+		fmt.Print("_______________________",r.Method)
+		switch r.Method {
+		
+		case http.MethodPost:
+			{
+				controller.GetDecryptData(w, r)
 			}
 		}
 	})
