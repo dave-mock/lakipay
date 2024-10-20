@@ -69,7 +69,6 @@ func (uc Usecase) CreateUser(token string, sirName string, firstName string, las
 			Message: err.Error(),
 		}
 	}
-
 	// Create Phone Identity
 	var phoneIdentity entity.PhoneIdentity
 	id = uuid.New()

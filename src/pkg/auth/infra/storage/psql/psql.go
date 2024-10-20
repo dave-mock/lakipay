@@ -6,12 +6,19 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/lib/pq"
 )
 
 func New(log *log.Logger) (*sql.DB, error) {
+	envFilePath := "C:\\Users\\Rinatoh computer\\Desktop\\lakipay\\.env" // Use double backslashes for Windows paths
+	err := godotenv.Load(envFilePath)
+	if err != nil {
+		log.Println("Error loading .env file:", err)
+		return nil, err
+	}
 
-	// Errors
+
 	const (
 		ErrFailedToConnect = "FAILED_TO_CONNECT"
 		ErrFailedToPing    = "FAILED_TO_PING"
@@ -21,8 +28,6 @@ func New(log *log.Logger) (*sql.DB, error) {
 	log.SetPrefix(log.Prefix() + " [AUTH] [INFRA] [STORAGE] [PSQL] ")
 	log.Println("Initiating pg db")
 
-	// Configure Database
-	// Get host, username, password from env
 	var (
 		host, _     = os.LookupEnv("DB_HOST")
 		user, _     = os.LookupEnv("DB_USER")
@@ -37,7 +42,7 @@ func New(log *log.Logger) (*sql.DB, error) {
 
 	db, err := sql.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", user, password, host, port, dbName, sslMode))
 	if err != nil {
-		log.Println("Failed to connect to db server : " + err.Error())
+		log.Println("Failed to connect to db server: " + err.Error())
 		return nil, err
 	}
 
@@ -49,24 +54,19 @@ func New(log *log.Logger) (*sql.DB, error) {
 		if err, ok := err.(*pq.Error); ok {
 			switch err.Code.Name() {
 			case "invalid_catalog_name":
-				{
-					log.Println("The specified database does not exist, trying to create one")
-					_, err := db.Exec("create database " + dbName)
-					if err != nil {
-						//handle the error
-						log.Println(err.Error())
-					}
-					if err = db.Ping(); err != nil {
-						log.Println("Pinging the new database failed : " + err.Error())
-					}
-					return db, nil
+				log.Println("The specified database does not exist, trying to create one")
+				_, err := db.Exec("create database " + dbName)
+				if err != nil {
+					log.Println(err.Error())
 				}
+				if err = db.Ping(); err != nil {
+					log.Println("Pinging the new database failed: " + err.Error())
+				}
+				return db, nil
 			}
-			// log.Println(err.Code.Name())
 			return nil, err
 		}
 		return nil, err
-
 	}
 
 	log.Println("Successfully connected to database")
