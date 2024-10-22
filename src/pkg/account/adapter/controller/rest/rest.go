@@ -8,8 +8,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -237,6 +239,51 @@ func New(log *log.Logger, interactor usecase.Interactor, sm *http.ServeMux, auth
 			http.Error(w, "Unsupported method", http.StatusMethodNotAllowed)
 		}
 	})
+	// Endpoint for LakiPay Transaction Status Query
+	sm.HandleFunc("/mpesa/transaction-status", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			var requestBody struct {
+				TransactionID   string `json:"TransactionID"`
+				PartyA          string `json:"PartyA"`
+				ResultURL       string `json:"ResultURL"`
+				QueueTimeOutURL string `json:"QueueTimeOutURL"`
+				Remarks         string `json:"Remarks"`
+				Occasion        string `json:"Occasion"`
+			}
+
+			body, err := io.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, "Error reading request body", http.StatusInternalServerError)
+				log.Printf("Error reading request body: %v", err)
+				return
+			}
+			if err := json.Unmarshal(body, &requestBody); err != nil {
+				http.Error(w, "Error parsing JSON", http.StatusBadRequest)
+				log.Printf("Error parsing JSON: %v", err)
+				return
+			}
+
+			statusRequest := TransactionStatusRequest{
+				Initiator:          "apitest",
+				SecurityCredential: "K2tH8KzkmIjCSEOAwgiI6T4ThpQT2DQa/rZfRc8+6iYA62vIsCUhhV0yxM84p0O/70aAiJ6EZwr/bE17Ww1VPMpzPwBadgf+dTwdz8LueZi4kUyZleoIYiJ3jNjkaXMT2g29JHJKRePbd4fsk+y38avf9zl5HG1N9UrpjaT2LhZOjmmPj4U1P/l3NP9C+AlcbAtHmtrkyIhvPrH4XwtDZasRcxUpPMbVcvajaBrcixIga8I4bvfBJfsnspSmpSDoTZ1f9glMYy1qRD83NX6R4/ToD0K0n7z0tKo35rJIn6a1bpVqKXuPmrkcK9ck0nAtmPQy8om6pwCmzDu+sG6slg==",
+				CommandID:          "TransactionStatusQuery",
+				TransactionID:      requestBody.TransactionID,
+				PartyA:             requestBody.PartyA,
+				IdentifierType:     "4",
+				ResultURL:          requestBody.ResultURL,
+				QueueTimeOutURL:    requestBody.QueueTimeOutURL,
+				Remarks:            requestBody.Remarks,
+				Occasion:           requestBody.Occasion,
+			}
+
+			go handleTransactionStatusRequest(statusRequest, w)
+			w.WriteHeader(http.StatusAccepted)
+			fmt.Fprint(w, "Transaction status request accepted")
+		} else {
+			http.Error(w, "Unsupported method", http.StatusMethodNotAllowed)
+		}
+	})
+
 	return controller
 }
 
@@ -266,7 +313,6 @@ func handleSTKPushRequest(req StkPushRequest) {
 
 	// Log the JSON payload for debugging
 	log.Printf("Sending USSD Request: %s", jsonData)
-
 	request, err := http.NewRequest("POST", "https://apisandbox.safaricom.et/mpesa/stkpush/v1/processrequest", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Printf("Error creating new request: %v", err)
@@ -296,31 +342,94 @@ func handleSTKPushRequest(req StkPushRequest) {
 	}
 }
 
-// getAccessToken function to obtain access token from Safaricom API
+// Structure for Transaction Status Request
+type TransactionStatusRequest struct {
+	Initiator          string `json:"Initiator"`
+	SecurityCredential string `json:"SecurityCredential"`
+	CommandID          string `json:"CommandID"`
+	TransactionID      string `json:"TransactionID"`
+	PartyA             string `json:"PartyA"`
+	IdentifierType     string `json:"IdentifierType"`
+	ResultURL          string `json:"ResultURL"`
+	QueueTimeOutURL    string `json:"QueueTimeOutURL"`
+	Remarks            string `json:"Remarks"`
+	Occasion           string `json:"Occasion"`
+}
+
+// Function to send status  request and handle the response
+func handleTransactionStatusRequest(req TransactionStatusRequest, w http.ResponseWriter) {
+	jsonData, err := json.Marshal(req)
+	if err != nil {
+		log.Printf("Error marshalling transaction status request: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Sending Transaction Status Request: %s", jsonData)
+
+	request, err := http.NewRequest("POST", "https://apisandbox.safaricom.et/mpesa/transactionstatus/v1/query", bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Printf("Problem creating new request: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	accessToken, err := getAccessToken()
+	if err != nil {
+		log.Printf("Problem getting access token: %v", err)
+		http.Error(w, "Failed to retrieve access token", http.StatusInternalServerError)
+		return
+	}
+	request.Header.Set("Authorization", "Bearer "+accessToken)
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(request)
+	if err != nil {
+		log.Printf("Error sending transaction status request: %v", err)
+		http.Error(w, "Failed to send request", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	responseBody, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Failed to send transaction status request: %s, Status Code: %d", responseBody, resp.StatusCode)
+		http.Error(w, fmt.Sprintf("Error: %s", responseBody), resp.StatusCode)
+	} else {
+		log.Printf("Transaction status request successful: %s", responseBody)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(responseBody)
+	}
+}
+
+// This obtains an access token from the Safaricom API
 func getAccessToken() (string, error) {
-	         username := "jgdPJACy5TPGniKsmxahZgjYsfCn9ILI2LZanmk5kukRycGd"
-	         password := "nLIqp5u77VqO2TKshWYAOaG33sMiCkGh7g6NOcnLKFsoneFpwnwskDaOMWs4Vgc1"
-	         grantType := "client_credentials"
+	username := os.Getenv("SAFARICOM_USERNAME")
+	password := os.Getenv("SAFARICOM_PASSWORD")
+	grantType := "client_credentials"
 
-	         auth := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
-	           url := "https://apisandbox.safaricom.et/v1/token/generate?grant_type=" + grantType
+	auth := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
+	url := "https://apisandbox.safaricom.et/v1/token/generate?grant_type=" + grantType
 
-	             req, err := http.NewRequest("GET", url, nil)
-	                 if err != nil {
-	                 	return "", err
-	                   }
-	                 req.Header.Set("Authorization", "Basic "+auth)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to create request: %v", err)
+	}
+	req.Header.Set("Authorization", "Basic "+auth)
 
-	                 client := &http.Client{Timeout: 60 * time.Second}
-	                 resp, err := client.Do(req)
-	                    if err != nil {
-		return "", err
-	                        }
-	                   defer resp.Body.Close()
-	                 body, err := io.ReadAll(resp.Body)
-	                 if err != nil {
-		return "", err
-                  	}
+	client := &http.Client{Timeout: 60 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to send request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read response body: %v", err)
+	}
 
 	// Log the response body for debugging
 	log.Printf("Response body: %s", body)
@@ -336,7 +445,7 @@ func getAccessToken() (string, error) {
 		ExpiresIn   string `json:"expires_in"`
 	}
 	if err := json.Unmarshal(body, &tokenResp); err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to unmarshal response: %v", err)
 	}
 
 	return tokenResp.AccessToken, nil
