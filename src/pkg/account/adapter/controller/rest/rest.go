@@ -3,16 +3,10 @@ package rest
 import (
 	"auth/src/pkg/account/usecase"
 	auth "auth/src/pkg/auth/adapter/controller/procedure"
-	"bytes"
-	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
-	"time"
 )
 
 // Controller struct
@@ -182,6 +176,23 @@ func New(log *log.Logger, interactor usecase.Interactor, sm *http.ServeMux, auth
 		}
 	})
 
+	sm.HandleFunc("/account/mpesa/ussd-push", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			controller.MpesaUssdPush(w, r)
+		default:
+			http.Error(w, "Unsupported method", http.StatusMethodNotAllowed)
+		}
+	})
+	sm.HandleFunc("/account/mpesa/transaction-status", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			controller.GetRequestTransaction(w, r)
+		default:
+			http.Error(w, "Unsupported method", http.StatusMethodNotAllowed)
+		}
+	})
+
 	// Test endpoint
 	sm.HandleFunc("/accounts/epg", func(w http.ResponseWriter, r *http.Request) {
 		controller.log.Println(r.Method)
@@ -193,262 +204,7 @@ func New(log *log.Logger, interactor usecase.Interactor, sm *http.ServeMux, auth
 		controller.log.Println(string(body))
 		w.Write([]byte("EPG"))
 	})
-
-	// Endpoint for USSD Push requests
-	sm.HandleFunc("/mpesa/ussd-push", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			var requestBody struct {
-				Amount           float64 `json:"Amount"`
-				PartyA           string  `json:"PartyA"`
-				PartyB           string  `json:"PartyB"`
-				PhoneNumber      string  `json:"PhoneNumber"`
-				CallBackURL      string  `json:"CallBackURL"`
-				AccountReference string  `json:"AccountReference"`
-				TransactionDesc  string  `json:"TransactionDesc"`
-				OrderID          string  `json:"OrderID"`
-			}
-			body, err := io.ReadAll(r.Body)
-			if err != nil {
-				http.Error(w, "Error reading request body", http.StatusInternalServerError)
-				log.Printf("Error reading request body: %v", err)
-				return
-			}
-			if err := json.Unmarshal(body, &requestBody); err != nil {
-				http.Error(w, "Error parsing JSON", http.StatusBadRequest)
-				log.Printf("Error parsing JSON: %v", err)
-				return
-			}
-			stkPushRequest := StkPushRequest{
-				BusinessShortCode: "20017",                                                            // Replace with your actual business short code
-				Password:          "7fc641d11b7e5037f486741802a66db71de96fab6feba56a4ddb9cf41b912b9f", // Replace with actual password
-				Timestamp:         time.Now().Format("20060102150405"),
-				TransactionType:   "CustomerPayBillOnline",
-				Amount:            requestBody.Amount,
-				PartyA:            requestBody.PartyA,
-				PartyB:            requestBody.PartyB,
-				PhoneNumber:       requestBody.PhoneNumber,
-				CallBackURL:       requestBody.CallBackURL,
-				AccountReference:  requestBody.AccountReference,
-				TransactionDesc:   requestBody.TransactionDesc,
-				OrderID:           requestBody.OrderID,
-			}
-			go handleSTKPushRequest(stkPushRequest)
-			w.WriteHeader(http.StatusAccepted)
-			fmt.Fprintf(w, "Payment request accepted")
-		} else {
-			http.Error(w, "Unsupported method", http.StatusMethodNotAllowed)
-		}
-	})
-	// Endpoint for LakiPay Transaction Status Query
-	sm.HandleFunc("/mpesa/transaction-status", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			var requestBody struct {
-				TransactionID   string `json:"TransactionID"`
-				PartyA          string `json:"PartyA"`
-				ResultURL       string `json:"ResultURL"`
-				QueueTimeOutURL string `json:"QueueTimeOutURL"`
-				Remarks         string `json:"Remarks"`
-				Occasion        string `json:"Occasion"`
-			}
-
-			body, err := io.ReadAll(r.Body)
-			if err != nil {
-				http.Error(w, "Error reading request body", http.StatusInternalServerError)
-				log.Printf("Error reading request body: %v", err)
-				return
-			}
-			if err := json.Unmarshal(body, &requestBody); err != nil {
-				http.Error(w, "Error parsing JSON", http.StatusBadRequest)
-				log.Printf("Error parsing JSON: %v", err)
-				return
-			}
-
-			statusRequest := TransactionStatusRequest{
-				Initiator:          "apitest",
-				SecurityCredential: "K2tH8KzkmIjCSEOAwgiI6T4ThpQT2DQa/rZfRc8+6iYA62vIsCUhhV0yxM84p0O/70aAiJ6EZwr/bE17Ww1VPMpzPwBadgf+dTwdz8LueZi4kUyZleoIYiJ3jNjkaXMT2g29JHJKRePbd4fsk+y38avf9zl5HG1N9UrpjaT2LhZOjmmPj4U1P/l3NP9C+AlcbAtHmtrkyIhvPrH4XwtDZasRcxUpPMbVcvajaBrcixIga8I4bvfBJfsnspSmpSDoTZ1f9glMYy1qRD83NX6R4/ToD0K0n7z0tKo35rJIn6a1bpVqKXuPmrkcK9ck0nAtmPQy8om6pwCmzDu+sG6slg==",
-				CommandID:          "TransactionStatusQuery",
-				TransactionID:      requestBody.TransactionID,
-				PartyA:             requestBody.PartyA,
-				IdentifierType:     "4",
-				ResultURL:          requestBody.ResultURL,
-				QueueTimeOutURL:    requestBody.QueueTimeOutURL,
-				Remarks:            requestBody.Remarks,
-				Occasion:           requestBody.Occasion,
-			}
-
-			go handleTransactionStatusRequest(statusRequest, w)
-			w.WriteHeader(http.StatusAccepted)
-			fmt.Fprint(w, "Transaction status request accepted")
-		} else {
-			http.Error(w, "Unsupported method", http.StatusMethodNotAllowed)
-		}
-	})
-
 	return controller
-}
-
-// USSDPushRequest struct
-type StkPushRequest struct {
-	BusinessShortCode string  `json:"BusinessShortCode"`
-	Password          string  `json:"Password"`
-	Timestamp         string  `json:"Timestamp"`
-	TransactionType   string  `json:"TransactionType"`
-	Amount            float64 `json:"Amount"`
-	PartyA            string  `json:"PartyA"`
-	PartyB            string  `json:"PartyB"`
-	PhoneNumber       string  `json:"PhoneNumber"`
-	CallBackURL       string  `json:"CallBackURL"`
-	AccountReference  string  `json:"AccountReference"`
-	TransactionDesc   string  `json:"TransactionDesc"`
-	OrderID           string  `json:"OrderID"`
-}
-
-// handleSTKPushRequest function to send USSD push request
-func handleSTKPushRequest(req StkPushRequest) {
-	jsonData, err := json.Marshal(req)
-	if err != nil {
-		log.Printf("Error marshalling STK push request: %v", err)
-		return
-	}
-
-	// Log the JSON payload for debugging
-	log.Printf("Sending USSD Request: %s", jsonData)
-	request, err := http.NewRequest("POST", "https://apisandbox.safaricom.et/mpesa/stkpush/v1/processrequest", bytes.NewBuffer(jsonData))
-	if err != nil {
-		log.Printf("Error creating new request: %v", err)
-		return
-	}
-	accessToken, err := getAccessToken()
-	if err != nil {
-		log.Printf("Error getting access token: %v", err)
-		return
-	}
-	request.Header.Set("Authorization", "Bearer "+accessToken)
-	request.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(request)
-	if err != nil {
-		log.Printf("Error sending STK push request: %v", err)
-		return
-	}
-	defer resp.Body.Close()
-
-	// Log response status and body
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		log.Printf("Failed to send STK push request: %s, Status Code: %d", body, resp.StatusCode)
-	} else {
-		log.Printf("USSD push request successful: Status Code: %d", resp.StatusCode)
-	}
-}
-
-// Structure for Transaction Status Request
-type TransactionStatusRequest struct {
-	Initiator          string `json:"Initiator"`
-	SecurityCredential string `json:"SecurityCredential"`
-	CommandID          string `json:"CommandID"`
-	TransactionID      string `json:"TransactionID"`
-	PartyA             string `json:"PartyA"`
-	IdentifierType     string `json:"IdentifierType"`
-	ResultURL          string `json:"ResultURL"`
-	QueueTimeOutURL    string `json:"QueueTimeOutURL"`
-	Remarks            string `json:"Remarks"`
-	Occasion           string `json:"Occasion"`
-}
-
-// Function to send status  request and handle the response
-func handleTransactionStatusRequest(req TransactionStatusRequest, w http.ResponseWriter) {
-	jsonData, err := json.Marshal(req)
-	if err != nil {
-		log.Printf("Error marshalling transaction status request: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	log.Printf("Sending Transaction Status Request: %s", jsonData)
-
-	request, err := http.NewRequest("POST", "https://apisandbox.safaricom.et/mpesa/transactionstatus/v1/query", bytes.NewBuffer(jsonData))
-	if err != nil {
-		log.Printf("Problem creating new request: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	accessToken, err := getAccessToken()
-	if err != nil {
-		log.Printf("Problem getting access token: %v", err)
-		http.Error(w, "Failed to retrieve access token", http.StatusInternalServerError)
-		return
-	}
-	request.Header.Set("Authorization", "Bearer "+accessToken)
-	request.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(request)
-	if err != nil {
-		log.Printf("Error sending transaction status request: %v", err)
-		http.Error(w, "Failed to send request", http.StatusInternalServerError)
-		return
-	}
-	defer resp.Body.Close()
-
-	responseBody, _ := io.ReadAll(resp.Body)
-	if resp.StatusCode != http.StatusOK {
-		log.Printf("Failed to send transaction status request: %s, Status Code: %d", responseBody, resp.StatusCode)
-		http.Error(w, fmt.Sprintf("Error: %s", responseBody), resp.StatusCode)
-	} else {
-		log.Printf("Transaction status request successful: %s", responseBody)
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(responseBody)
-	}
-}
-
-// This obtains an access token from the Safaricom API
-func getAccessToken() (string, error) {
-	username := os.Getenv("SAFARICOM_USERNAME")
-	password := os.Getenv("SAFARICOM_PASSWORD")
-	grantType := "client_credentials"
-
-	auth := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
-	url := "https://apisandbox.safaricom.et/v1/token/generate?grant_type=" + grantType
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return "", fmt.Errorf("failed to create request: %v", err)
-	}
-	req.Header.Set("Authorization", "Basic "+auth)
-
-	client := &http.Client{Timeout: 60 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("failed to send request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("failed to read response body: %v", err)
-	}
-
-	// Log the response body for debugging
-	log.Printf("Response body: %s", body)
-
-	// Check for a non-200 status code
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("HTTP error: %s, response: %s", resp.Status, body)
-	}
-
-	var tokenResp struct {
-		AccessToken string `json:"access_token"`
-		TokenType   string `json:"token_type"`
-		ExpiresIn   string `json:"expires_in"`
-	}
-	if err := json.Unmarshal(body, &tokenResp); err != nil {
-		return "", fmt.Errorf("failed to unmarshal response: %v", err)
-	}
-
-	return tokenResp.AccessToken, nil
 }
 
 type Error struct {
@@ -469,7 +225,6 @@ func SendJSONResponse(w http.ResponseWriter, data Response, status int) {
 		w.Write([]byte(err.Error()))
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	w.Write(serData)

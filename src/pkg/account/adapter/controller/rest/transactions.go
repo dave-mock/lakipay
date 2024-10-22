@@ -1,19 +1,19 @@
 package rest
 
 import (
-	"auth/src/pkg/auth/infra/storage/psql"
-	"auth/src/pkg/utils"
-	"database/sql"
-	"log"
-	"os"
-
+	"auth/src/pkg/account/adapter/gateway/mpesa"
 	"auth/src/pkg/account/core/entity"
 	"auth/src/pkg/account/usecase"
 	"auth/src/pkg/auth/adapter/controller/procedure"
 	auth "auth/src/pkg/auth/adapter/controller/procedure"
+	"auth/src/pkg/auth/infra/storage/psql"
+	"auth/src/pkg/utils"
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -1004,6 +1004,268 @@ func (controller Controller) GetRequestTransactionInitiate(w http.ResponseWriter
 		Data:    txn,
 	}, http.StatusOK)
 
+}
+
+func (controller Controller) MpesaUssdPush(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("||||||| handleSTKPushRequest")
+	controller.log.Println("Processing STK Push Request")
+
+	// Authenticate (AuthN)
+	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "UNAUTHORIZED",
+				Message: "Please provide an authentication token in header",
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Validate token
+	token := strings.Split(r.Header.Get("Authorization"), " ")[1]
+	session, err := controller.auth.GetCheckAuth(token)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(procedure.Error).Type,
+				Message: err.(procedure.Error).Message,
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Define the USSDPushRequest struct inside the function
+	type USSDPushRequest struct {
+		BusinessShortCode string  `json:"BusinessShortCode"`
+		Password          string  `json:"Password"`
+		Timestamp         string  `json:"Timestamp"`
+		TransactionType   string  `json:"TransactionType"`
+		Amount            float64 `json:"Amount"`
+		PartyA            string  `json:"PartyA"`
+		PartyB            string  `json:"PartyB"`
+		PhoneNumber       string  `json:"PhoneNumber"`
+		CallBackURL       string  `json:"CallBackURL"`
+		AccountReference  string  `json:"AccountReference"`
+		TransactionDesc   string  `json:"TransactionDesc"`
+		MerchantName      string  `json:"MerchantName"`
+		Signature         string  `json:"signature"`
+		TwoFA             string  `json:"2fa"`
+		Challenge         string  `json:"challenge"`
+		OTP               string  `json:"otp"`
+		ChallengeType     string  `json:"challenge_type"`
+	}
+
+	// Decode the STK push request from the body
+	var req USSDPushRequest
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&req)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: err.Error(),
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	// Log the request data
+	controller.log.Printf("Received STK Push Request: %+v", req)
+
+	// Convert PartyA and PartyB from strings to uuid.UUID
+	fromUUID, err := uuid.Parse(req.PartyA)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_UUID",
+				Message: "Invalid UUID for PartyA",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	toUUID, err := uuid.Parse(req.PartyB)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_UUID",
+				Message: "Invalid UUID for PartyB",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	// Populate transaction challenge fields
+	var transactionChallenge entity.TransactionChallange
+	transactionChallenge.Signature = req.Signature
+	transactionChallenge.TwoFA = req.TwoFA
+	transactionChallenge.Challenge = req.Challenge
+	transactionChallenge.OTP = req.OTP
+
+	// Usecase [CREATE TRANSACTION]
+	txn, err := controller.interactor.CreateTransaction(
+		session.User.Id,
+		fromUUID,
+		toUUID,
+		req.Amount,
+		req.TransactionType,
+		token,
+		req.ChallengeType,
+		transactionChallenge,
+	)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(usecase.Error).Type,
+				Message: err.(usecase.Error).Message,
+			},
+		}, http.StatusInternalServerError)
+		return
+	}
+
+	// Create the USSD Push request
+	ussdRequest := mpesa.USSDPushRequest{
+		BusinessShortCode: req.BusinessShortCode,
+		Password:          req.Password,
+		Timestamp:         req.Timestamp,
+		TransactionType:   req.TransactionType,
+		Amount:            req.Amount,
+		PartyA:            req.PartyA,
+		PartyB:            req.PartyB,
+		PhoneNumber:       req.PhoneNumber,
+		CallBackURL:       req.CallBackURL,
+		AccountReference:  req.AccountReference,
+		TransactionDesc:   req.TransactionDesc,
+		MerchantName:      req.MerchantName,
+	}
+
+	// Send the STK Push request
+	if err := mpesa.HandleSTKPushRequest(ussdRequest); err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "MPESA_ERROR",
+				Message: err.Error(),
+			},
+		}, http.StatusInternalServerError)
+		return
+	}
+
+	// Send success response
+	SendJSONResponse(w, Response{Success: true, Data: txn}, http.StatusOK)
+}
+
+func (controller *Controller) MpesaUssdTransactionStatus(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("||||||| handleSTKPushRequest")
+	controller.log.Println("Processing STK Push Request")
+
+	// Authenticate (AuthN)
+	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "UNAUTHORIZED",
+				Message: "Please provide an authentication token in header",
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Validate token
+	token := strings.Split(r.Header.Get("Authorization"), " ")[1]
+	session, err := controller.auth.GetCheckAuth(token)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(procedure.Error).Type,
+				Message: err.(procedure.Error).Message,
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Log session information (optional)
+	controller.log.Printf("Session info: %+v", session)
+
+	// Structure for Transaction Status Request
+	type TransactionStatusRequest struct {
+		Initiator          string `json:"Initiator"`
+		SecurityCredential string `json:"SecurityCredential"`
+		CommandID          string `json:"CommandID"`
+		TransactionID      string `json:"TransactionID"`
+		PartyA             string `json:"PartyA"`
+		IdentifierType     string `json:"IdentifierType"`
+		ResultURL          string `json:"ResultURL"`
+		QueueTimeOutURL    string `json:"QueueTimeOutURL"`
+		Remarks            string `json:"Remarks"`
+		Occasion           string `json:"Occasion"`
+		Signature          string `json:"signature"`
+		TwoFA              string `json:"2fa"`
+		Challenge          string `json:"challenge"`
+		OTP                string `json:"otp"`
+		ChallengeType      string `json:"challenge_type"`
+	}
+
+	// Decode the USSD push request from the body
+	var req TransactionStatusRequest
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&req)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: err.Error(),
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+	controller.log.Printf("Transac Status check Request: %+v", req)
+
+	// Populate transaction challenge fields
+	var transactionChallenge entity.TransactionChallange
+	transactionChallenge.Signature = req.Signature
+	transactionChallenge.TwoFA = req.TwoFA
+	transactionChallenge.Challenge = req.Challenge
+	transactionChallenge.OTP = req.OTP
+
+	// Create the USSD Push request
+	TransactionStatusReq := mpesa.TransactionStatusRequest{
+		Initiator:          req.Initiator,
+		SecurityCredential: req.SecurityCredential,
+		CommandID:          req.CommandID,
+		TransactionID:      req.TransactionID,
+		PartyA:             req.PartyA,
+		IdentifierType:     req.IdentifierType,
+		ResultURL:          req.ResultURL,
+		QueueTimeOutURL:    req.QueueTimeOutURL,
+		Remarks:            req.Remarks,
+		Occasion:           req.Occasion,
+	}
+
+	// Send the transaction status request
+	if err := mpesa.HandleTransactionStatusRequest(TransactionStatusReq); err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "MPESA_ERROR",
+				Message: err.Error(),
+			},
+		}, http.StatusInternalServerError)
+		return
+	}
+
+	// Send success response
+	SendJSONResponse(w, Response{Success: true}, http.StatusOK)
 }
 
 func (controller Controller) GetRequestTransaction(w http.ResponseWriter, r *http.Request) {

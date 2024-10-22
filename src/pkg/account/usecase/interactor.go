@@ -36,6 +36,7 @@ type Interactor interface {
 
 	CreateTransactionInitiate(userId uuid.UUID, from uuid.UUID, to uuid.UUID, amount float64, medium entity.TransactionMedium, txnType string, token string, detail string) (interface{}, error)
 	CreateTransaction(userId uuid.UUID, from uuid.UUID, to uuid.UUID, amount float64, txnType string, token string, challenge_type string, challenge entity.TransactionChallange) (*entity.Transaction, error)
+
 	// VerifyTransaction(userId, txnId uuid.UUID, code string, amount float64) (*entity.Transaction, error)
 	GetUserTransactions(id uuid.UUID) ([]entity.Transaction, error)
 	GetAllTransactions() ([]entity.Transaction, error)
