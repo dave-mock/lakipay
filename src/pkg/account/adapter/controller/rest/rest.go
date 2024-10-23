@@ -187,7 +187,7 @@ func New(log *log.Logger, interactor usecase.Interactor, sm *http.ServeMux, auth
 	sm.HandleFunc("/account/mpesa/transaction-status", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			controller.GetRequestTransaction(w, r)
+			controller.MpesaUssdTransactionStatus(w, r)
 		default:
 			http.Error(w, "Unsupported method", http.StatusMethodNotAllowed)
 		}

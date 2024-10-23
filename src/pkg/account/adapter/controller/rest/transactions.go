@@ -1162,7 +1162,7 @@ func (controller Controller) MpesaUssdPush(w http.ResponseWriter, r *http.Reques
 	SendJSONResponse(w, Response{Success: true, Data: txn}, http.StatusOK)
 }
 
-func (controller *Controller) MpesaUssdTransactionStatus(w http.ResponseWriter, r *http.Request) {
+func (controller Controller) MpesaUssdTransactionStatus(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("||||||| handleSTKPushRequest")
 	controller.log.Println("Processing STK Push Request")
 
