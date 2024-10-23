@@ -1285,7 +1285,7 @@ func (controller Controller) GetRequestTransaction(w http.ResponseWriter, r *htt
 		return
 	}
 
-	// Validate token
+	// Validate the token
 	token := strings.Split(r.Header.Get("Authorization"), " ")[1]
 
 	session, err := controller.auth.GetCheckAuth(token)
@@ -1302,10 +1302,7 @@ func (controller Controller) GetRequestTransaction(w http.ResponseWriter, r *htt
 	}
 
 	fmt.Println("||| pass auth")
-
-	// Check access (AuthZ)
-
-	// Parse
+	// Parse the request
 	type Request struct {
 		From          uuid.UUID `json:"from"`
 		To            uuid.UUID `json:"to"`
