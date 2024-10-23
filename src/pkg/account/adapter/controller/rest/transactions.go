@@ -1057,7 +1057,7 @@ func (controller Controller) MpesaUssdPush(w http.ResponseWriter, r *http.Reques
 		ChallengeType     string  `json:"challenge_type"`
 	}
 
-	// Decode the STK push request from the body
+	// Decode the request from the body
 	var req USSDPushRequest
 	decoder := json.NewDecoder(r.Body)
 	err = decoder.Decode(&req)
@@ -1074,7 +1074,7 @@ func (controller Controller) MpesaUssdPush(w http.ResponseWriter, r *http.Reques
 	defer r.Body.Close()
 
 	// Log the request data
-	controller.log.Printf("Received STK Push Request: %+v", req)
+	controller.log.Printf("log USSD Push Request ... %+v", req)
 
 	// Convert PartyA and PartyB from strings to uuid.UUID
 	fromUUID, err := uuid.Parse(req.PartyA)
