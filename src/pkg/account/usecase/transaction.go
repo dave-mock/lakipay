@@ -1519,7 +1519,6 @@ func (uc Usecase) VerifyTransaction(UserId uuid.UUID, token string, challenge en
 
 func (uc Usecase) CreateTransaction(userId uuid.UUID, from uuid.UUID, to uuid.UUID, amount float64, txnType string, token string, challenge_type string, challenge entity.TransactionChallange) (*entity.Transaction, error) {
 	var txn entity.Transaction
-
 	var sender *entity.Account
 	var receipient *entity.Account
 	var err error

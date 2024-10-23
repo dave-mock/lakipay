@@ -1007,8 +1007,8 @@ func (controller Controller) GetRequestTransactionInitiate(w http.ResponseWriter
 }
 
 func (controller Controller) MpesaUssdPush(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("||||||| handleSTKPushRequest")
-	controller.log.Println("Processing STK Push Request")
+	fmt.Println("||||||| || handle USSD Push Request ||||||||")
+	controller.log.Println("Processing USSD Push Request")
 
 	// Authenticate (AuthN)
 	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
@@ -1038,23 +1038,24 @@ func (controller Controller) MpesaUssdPush(w http.ResponseWriter, r *http.Reques
 
 	// Define the USSDPushRequest struct inside the function
 	type USSDPushRequest struct {
-		BusinessShortCode string  `json:"BusinessShortCode"`
-		Password          string  `json:"Password"`
-		Timestamp         string  `json:"Timestamp"`
-		TransactionType   string  `json:"TransactionType"`
-		Amount            float64 `json:"Amount"`
-		PartyA            string  `json:"PartyA"`
-		PartyB            string  `json:"PartyB"`
-		PhoneNumber       string  `json:"PhoneNumber"`
-		CallBackURL       string  `json:"CallBackURL"`
-		AccountReference  string  `json:"AccountReference"`
-		TransactionDesc   string  `json:"TransactionDesc"`
-		MerchantName      string  `json:"MerchantName"`
-		Signature         string  `json:"signature"`
-		TwoFA             string  `json:"2fa"`
-		Challenge         string  `json:"challenge"`
-		OTP               string  `json:"otp"`
-		ChallengeType     string  `json:"challenge_type"`
+		BusinessShortCode string                   `json:"BusinessShortCode"`
+		Password          string                   `json:"Password"`
+		Timestamp         string                   `json:"Timestamp"`
+		TransactionType   string                   `json:"TransactionType"`
+		Amount            float64                  `json:"Amount"`
+		PartyA            string                   `json:"PartyA"`
+		PartyB            string                   `json:"PartyB"`
+		Medium            entity.TransactionMedium `json:"Medium"`
+		PhoneNumber       string                   `json:"PhoneNumber"`
+		CallBackURL       string                   `json:"CallBackURL"`
+		AccountReference  string                   `json:"AccountReference"`
+		TransactionDesc   string                   `json:"TransactionDesc"`
+		MerchantName      string                   `json:"MerchantName"`
+		Signature         string                   `json:"signature"`
+		TwoFA             string                   `json:"2fa"`
+		Challenge         string                   `json:"challenge"`
+		OTP               string                   `json:"otp"`
+		ChallengeType     string                   `json:"challenge_type"`
 	}
 
 	// Decode the request from the body
@@ -1108,16 +1109,16 @@ func (controller Controller) MpesaUssdPush(w http.ResponseWriter, r *http.Reques
 	transactionChallenge.Challenge = req.Challenge
 	transactionChallenge.OTP = req.OTP
 
-	// Usecase [CREATE TRANSACTION]
-	txn, err := controller.interactor.CreateTransaction(
+	// Usecase [CREATE TRANSACTION INITIATE]
+	txn, err := controller.interactor.CreateTransactionInitiate(
 		session.User.Id,
 		fromUUID,
 		toUUID,
 		req.Amount,
+		req.Medium,
 		req.TransactionType,
 		token,
-		req.ChallengeType,
-		transactionChallenge,
+		req.TransactionDesc,
 	)
 	if err != nil {
 		SendJSONResponse(w, Response{
@@ -1126,7 +1127,7 @@ func (controller Controller) MpesaUssdPush(w http.ResponseWriter, r *http.Reques
 				Type:    err.(usecase.Error).Type,
 				Message: err.(usecase.Error).Message,
 			},
-		}, http.StatusInternalServerError)
+		}, http.StatusBadRequest)
 		return
 	}
 

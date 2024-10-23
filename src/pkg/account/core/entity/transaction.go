@@ -23,6 +23,7 @@ const (
 	LAKIPAY     TransactionMedium = "LAKIPAY"
 	CYBERSOURCE TransactionMedium = "CYBERSOURCE"
 	ETHSWITCH   TransactionMedium = "ETHSWITCH"
+	MPESA       TransactionMedium = "MPESA"
 )
 
 type Transaction struct {
