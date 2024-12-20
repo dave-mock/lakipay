@@ -689,3 +689,11 @@ func (uc Usecase) GetUserById(id uuid.UUID) (*entity.User, error) {
 
 	return user, err
 }
+
+func (uc Usecase) CheckPermission(userID uuid.UUID, requiredPermission entity.Permission) (bool, error) {
+	hasPermission, err := uc.repo.CheckPermission(userID, requiredPermission)
+	if err != nil {
+		return false, err
+	}
+	return hasPermission, nil
+}

@@ -199,14 +199,16 @@ func (repo PsqlRepo) FindSessionById(id uuid.UUID) (*entity.Session, error) {
 
 	var sirName sql.NullString
 	var lastName sql.NullString
+	var userType sql.NullString
 
 	err := repo.db.QueryRow(fmt.Sprintf(`
-	SELECT sessions.id, sessions.token, users.id, users.sir_name, users.first_name, users.last_name
+	SELECT sessions.id, sessions.token, users.id, users.sir_name, users.first_name, users.last_name, users.user_type
 	FROM %s.sessions
 	INNER JOIN %s.users ON %s.users.id = sessions.user_id
 	WHERE sessions.id = $1::UUID
-	`, repo.schema, repo.schema, repo.schema), id).Scan(&session.Id, &session.Token,
-		&session.User.Id, &sirName, &session.User.FirstName, &lastName,
+	`, repo.schema, repo.schema, repo.schema), id).Scan(
+		&session.Id, &session.Token,
+		&session.User.Id, &sirName, &session.User.FirstName, &lastName, &userType,
 	)
 
 	if sirName.Valid {
@@ -215,6 +217,12 @@ func (repo PsqlRepo) FindSessionById(id uuid.UUID) (*entity.Session, error) {
 
 	if lastName.Valid {
 		session.User.LastName = lastName.String
+	}
+
+	if userType.Valid {
+		session.User.UserType = userType.String
+	} else {
+		session.User.UserType = "UNKNOWN"
 	}
 
 	return &session, err
@@ -259,4 +267,86 @@ func (repo PsqlRepo) FindPasswordAuth(token string) (*entity.PasswordAuth, error
 	}
 
 	return &passwordAuth, err
+}
+
+func (repo PsqlRepo) CheckPermission(userID uuid.UUID, requiredPermission entity.Permission) (bool, error) {
+	var groups []uuid.UUID
+	// Query to fetch groups the user belongs to
+	queryGroups := `
+        SELECT g.id
+        FROM auth.user_groups ug
+        JOIN auth.groups g ON ug.group_id = g.id
+        WHERE ug.user_id = $1
+    `
+	rowsGroups, err := repo.db.Query(queryGroups, userID)
+	if err != nil {
+		return false, fmt.Errorf("failed to fetch user groups: %v", err)
+	}
+	defer rowsGroups.Close()
+
+	for rowsGroups.Next() {
+		var groupID uuid.UUID
+		if err := rowsGroups.Scan(&groupID); err != nil {
+			return false, fmt.Errorf("failed to scan group ID: %v", err)
+		}
+		groups = append(groups, groupID)
+	}
+
+	for _, groupID := range groups {
+		queryPermissions := `
+            SELECT p.resource, p.resource_identifier, p.operation, p.effect
+            FROM auth.group_permissions gp
+            JOIN auth.permissions p ON gp.permission_id = p.id
+            WHERE gp.group_id = $1
+              AND p.resource = $2
+              AND p.operation = $3
+              AND p.effect = $4
+        `
+		rowsPermissions, err := repo.db.Query(queryPermissions, groupID, requiredPermission.Resource, requiredPermission.Operation, requiredPermission.Effect)
+		if err != nil {
+			return false, fmt.Errorf("failed to fetch permissions for group %v: %v", groupID, err)
+		}
+		defer rowsPermissions.Close()
+
+		for rowsPermissions.Next() {
+			var permission entity.Permission
+			if err := rowsPermissions.Scan(&permission.Resource, &permission.ResourceIdentifier, &permission.Operation, &permission.Effect); err != nil {
+				return false, fmt.Errorf("failed to scan permission: %v", err)
+			}
+			if permission.Resource == requiredPermission.Resource &&
+				permission.Operation == requiredPermission.Operation &&
+				(permission.ResourceIdentifier == requiredPermission.ResourceIdentifier || permission.ResourceIdentifier == "*") &&
+				permission.Effect == "allow" {
+				return true, nil
+			}
+		}
+	}
+
+	return false, fmt.Errorf("user does not have the required permission")
+}
+
+func (repo PsqlRepo) FindUserPermissions(userID uuid.UUID, requiredPermission entity.Permission) ([]entity.Permission, error) {
+	var permissions []entity.Permission
+	query := fmt.Sprintf(`
+		SELECT resource, resource_identifier, operation, effect
+		FROM %s.permissions
+		WHERE user_id = $1
+		AND resource = $2
+		AND operation = $3
+		AND resource_identifier = $4
+	`, repo.schema)
+
+	rows, err := repo.db.Query(query, userID, requiredPermission.Resource, requiredPermission.Operation, requiredPermission.ResourceIdentifier)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch user permissions: %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var permission entity.Permission
+		if err := rows.Scan(&permission.Resource, &permission.ResourceIdentifier, &permission.Operation, &permission.Effect); err != nil {
+			return nil, fmt.Errorf("failed to scan permission: %v", err)
+		}
+		permissions = append(permissions, permission)
+	}
+	return permissions, nil
 }

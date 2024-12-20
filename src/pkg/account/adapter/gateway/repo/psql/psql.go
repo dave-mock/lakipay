@@ -25,7 +25,7 @@ func New(log *log.Logger, db *sql.DB) (usecase.Repo, error) {
 			created_at timestamp without time zone NOT NULL,
 			updated_at timestamp without time zone NOT NULL DEFAULT 'NOW()'
 		);`, _schema),
-		
+
 		"merchant_keys": fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s.merchant_keys
 		(
 			id uuid NOT NULL PRIMARY KEY,

@@ -11,6 +11,7 @@ type User struct {
 	SirName       string
 	FirstName     string
 	LastName      string
+	UserType      string
 	Gender        Gender
 	DateOfBirth   time.Time
 	Nationalities []Nationality

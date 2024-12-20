@@ -20,6 +20,7 @@ func (controller Controller) GetSignUp(w http.ResponseWriter, r *http.Request) {
 		SirName   string `json:"sir_name"`
 		FirstName string `json:"first_name"`
 		LastName  string `json:"last_name"`
+		UserType  string `json:"user_type,omitempty"`
 	}
 
 	// Response
@@ -130,11 +131,13 @@ func (controller Controller) GetSignUp(w http.ResponseWriter, r *http.Request) {
 				SirName   string    "json:\"sir_name,omitempty\""
 				FirstName string    "json:\"first_name\""
 				LastName  string    "json:\"last_name,omitempty\""
+				UserType  string    "json:\"user_type,omitempty\""
 			}{
 				Id:        session.User.Id,
 				SirName:   session.User.SirName,
 				FirstName: session.User.FirstName,
 				LastName:  session.User.LastName,
+				UserType:  session.User.UserType,
 			},
 		},
 	}, http.StatusOK)

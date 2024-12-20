@@ -32,6 +32,9 @@ type AuthNRepo interface {
 	// // Session
 	StoreSession(session entity.Session) error
 	UpdatePasswordIdentity(password string, userId uuid.UUID) error
+	// Permission
+	CheckPermission(userID uuid.UUID, requiredPermission entity.Permission) (bool, error)
+	FindUserPermissions(userID uuid.UUID, requiredPermission entity.Permission) ([]entity.Permission, error)
 }
 
 // Repo

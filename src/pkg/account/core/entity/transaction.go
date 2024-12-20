@@ -80,7 +80,6 @@ type MerchantKeys struct {
 type P2p struct {
 	Amount float64
 }
-
 type BatchTransaction struct {
 	Id   uuid.UUID
 	From []struct {

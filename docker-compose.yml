@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: lakipay_postgres_container
+    environment:
+      POSTGRES_USER: postgres  
+      POSTGRES_PASSWORD: Ashu.3.10  
+      POSTGRES_DB: stock 
+    ports:
+      - "5432:5432" 
+    volumes:
+      - pg_data:/var/lib/postgresql/data 
+    networks:
+      - app-network 
+
+  golang-app:
+    image: ashenafii/lakipay:latest 
+    container_name: lakipay
+    depends_on:
+      - postgres 
+    env_file:
+      - .env  
+    ports:
+      - "3000:3000"  
+    restart: always  
+    networks:
+      - app-network  
+
+volumes:
+  pg_data: 
+
+networks:
+  app-network: 
+    driver: bridge 
