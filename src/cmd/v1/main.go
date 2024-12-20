@@ -33,6 +33,18 @@ import (
 	accRepo "auth/src/pkg/account/adapter/gateway/repo/psql"
 	accUsecase "auth/src/pkg/account/usecase"
 
+	// [ERP]
+
+	erp "auth/src/pkg/erp/adapter/controller/rest"
+	erpRepo "auth/src/pkg/erp/adapter/gateway/repo/psql"
+	erpUsecase "auth/src/pkg/erp/usecase"
+
+	// [ACCESS CONTROL]
+
+	access_control "auth/src/pkg/access_control/adapter/controller/rest"
+	accessRepo "auth/src/pkg/access_control/adapter/gateway/repo/psql"
+	accessUsecase "auth/src/pkg/access_control/usecase"
+
 	// [STORAGE]
 	storage "auth/src/pkg/storage/adapter/controller/rest"
 	storageRepo "auth/src/pkg/storage/adapter/gateway/repo/psql"
@@ -96,5 +108,19 @@ func main() {
 	} else {
 		acc.New(log, accUsecase.New(log, _accRepo), s.ServeMux, procedure.New(log, authUsecase.New(log, _authRepo, sms.New(log))))
 	}
+	// ERP
+	_erpRepo, err := erpRepo.New(log, db)
+	if err != nil {
+		log.Println(err)
+	} else {
+		erp.New(log, erpUsecase.New(log, _erpRepo), s.ServeMux, procedure.New(log, authUsecase.New(log, _authRepo, sms.New(log))))
+	}
 
+	// ACCESS CONTROL
+	_accessRepo, err := accessRepo.New(log, db)
+	if err != nil {
+		log.Println(err)
+	} else {
+		access_control.New(log, accessUsecase.New(log, _accessRepo), s.ServeMux, procedure.New(log, authUsecase.New(log, _authRepo, sms.New(log))))
+	}
 }
