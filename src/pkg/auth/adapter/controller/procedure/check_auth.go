@@ -20,6 +20,7 @@ func (controller Controller) GetCheckAuth(token string) (*entity.Session, error)
 
 	return session, nil
 }
+
 func (controller Controller) HasPermission(userID uuid.UUID, requiredPermission entity.Permission) (bool, error) {
 	fmt.Println("========================= ", userID, requiredPermission)
 	hasPermission, err := controller.interactor.CheckPermission(userID, requiredPermission)

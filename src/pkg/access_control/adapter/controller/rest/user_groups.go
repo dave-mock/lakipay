@@ -350,3 +350,90 @@ func (controller Controller) GetUserGroups(w http.ResponseWriter, r *http.Reques
 		Data:    groups,
 	}, http.StatusOK)
 }
+func (controller Controller) GetGroupUsers(w http.ResponseWriter, r *http.Request) {
+	controller.log.SetPrefix("[CONTROLLER] [GetUserGroups] ")
+	authHeader := r.Header.Get("Authorization")
+	if len(strings.Split(authHeader, " ")) != 2 {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "UNAUTHORIZED",
+				Message: "Authentication token missing in header.",
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	token := strings.Split(authHeader, " ")[1]
+	session, err := controller.auth.GetCheckAuth(token)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(procedure.Error).Type,
+				Message: err.(procedure.Error).Message,
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+	fmt.Print(session)
+	type GetUserGroupsPayload struct {
+		GroupID string `json:"group_id"`
+	}
+
+	var req GetUserGroupsPayload
+	defer r.Body.Close()
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&req)
+	if err != nil {
+		controller.log.Println("Error decoding request:", err)
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "Failed to parse request body. " + err.Error(),
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	groupID, err := uuid.Parse(req.GroupID)
+	if err != nil {
+		controller.log.Println("Invalid user ID format:", err)
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_GROUP_ID",
+				Message: "Group ID must be a valid UUID. " + err.Error(),
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	users, err := controller.interactor.ListGroupUsers(groupID)
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			SendJSONResponse(w, Response{
+				Success: false,
+				Error: &Error{
+					Type:    "USER_GROUP_NOT_FOUND",
+					Message: fmt.Sprintf("Group with ID %v doesn't have not any member", groupID),
+				},
+			}, http.StatusNotFound)
+			return
+		}
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "USER_LIST_FETCH_ERROR",
+				Message: "Failed to fetch users " + err.Error(),
+			},
+		}, http.StatusInternalServerError)
+		return
+	}
+
+	SendJSONResponse(w, Response{
+		Success: true,
+		Data:    users,
+	}, http.StatusOK)
+}

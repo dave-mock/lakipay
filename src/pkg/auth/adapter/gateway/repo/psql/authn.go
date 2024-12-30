@@ -271,53 +271,59 @@ func (repo PsqlRepo) FindPasswordAuth(token string) (*entity.PasswordAuth, error
 
 func (repo PsqlRepo) CheckPermission(userID uuid.UUID, requiredPermission entity.Permission) (bool, error) {
 	var groups []uuid.UUID
-	// Query to fetch groups the user belongs to
 	queryGroups := `
         SELECT g.id
-        FROM auth.user_groups ug
-        JOIN auth.groups g ON ug.group_id = g.id
-        WHERE ug.user_id = $1
+        FROM auth.group_permissions gp
+        JOIN auth.groups g ON gp.group_id = g.id
+        JOIN auth.user_permissions up ON up.permission_id = gp.permission_id
+        WHERE up.user_id = $1
     `
 	rowsGroups, err := repo.db.Query(queryGroups, userID)
 	if err != nil {
-		return false, fmt.Errorf("failed to fetch user groups: %v", err)
+		return false, fmt.Errorf("failed to fetch user groups %v", err)
 	}
 	defer rowsGroups.Close()
-
 	for rowsGroups.Next() {
 		var groupID uuid.UUID
 		if err := rowsGroups.Scan(&groupID); err != nil {
-			return false, fmt.Errorf("failed to scan group ID: %v", err)
+			return false, fmt.Errorf("failed to scan group ID ||| %v", err)
 		}
 		groups = append(groups, groupID)
 	}
 
 	for _, groupID := range groups {
 		queryPermissions := `
-            SELECT p.resource, p.resource_identifier, p.operation, p.effect
+            SELECT p.resource, p.resource_id, p.operations, p.effect
             FROM auth.group_permissions gp
             JOIN auth.permissions p ON gp.permission_id = p.id
             WHERE gp.group_id = $1
               AND p.resource = $2
-              AND p.operation = $3
-              AND p.effect = $4
         `
-		rowsPermissions, err := repo.db.Query(queryPermissions, groupID, requiredPermission.Resource, requiredPermission.Operation, requiredPermission.Effect)
+		rowsPermissions, err := repo.db.Query(queryPermissions, groupID, requiredPermission.Resource)
 		if err != nil {
-			return false, fmt.Errorf("failed to fetch permissions for group %v: %v", groupID, err)
+			return false, fmt.Errorf("failed to fetch permissions for group %v|||| %v", groupID, err)
 		}
 		defer rowsPermissions.Close()
 
 		for rowsPermissions.Next() {
 			var permission entity.Permission
-			if err := rowsPermissions.Scan(&permission.Resource, &permission.ResourceIdentifier, &permission.Operation, &permission.Effect); err != nil {
-				return false, fmt.Errorf("failed to scan permission: %v", err)
+			var operations []uuid.UUID
+			if err := rowsPermissions.Scan(&permission.Resource, &permission.ResourceIdentifier, &operations, &permission.Effect); err != nil {
+				return false, fmt.Errorf("failed to scan permission |||||| %v", err)
 			}
+
+			operationNames, err := fetchOperationNames(repo, operations)
+			if err != nil {
+				return false, fmt.Errorf("failed to fetch operation names: %v", err)
+			}
+
 			if permission.Resource == requiredPermission.Resource &&
-				permission.Operation == requiredPermission.Operation &&
-				(permission.ResourceIdentifier == requiredPermission.ResourceIdentifier || permission.ResourceIdentifier == "*") &&
-				permission.Effect == "allow" {
-				return true, nil
+				containsOperation(operationNames, requiredPermission.Operation) {
+				if permission.Effect == "allow" {
+					return true, nil
+				} else if permission.Effect == "deny" {
+					return false, nil
+				}
 			}
 		}
 	}
@@ -325,16 +331,44 @@ func (repo PsqlRepo) CheckPermission(userID uuid.UUID, requiredPermission entity
 	return false, fmt.Errorf("user does not have the required permission")
 }
 
+func fetchOperationNames(repo PsqlRepo, operations []uuid.UUID) ([]string, error) {
+	var operationNames []string
+	for _, opID := range operations {
+		var opName string
+		query := `
+            SELECT name
+            FROM auth.operations
+            WHERE id = $1
+        `
+		err := repo.db.QueryRow(query, opID).Scan(&opName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch operation name for ID %v: %v", opID, err)
+		}
+		operationNames = append(operationNames, opName)
+	}
+	return operationNames, nil
+}
+
+func containsOperation(operations []string, requiredOperation string) bool {
+	for _, op := range operations {
+		if op == requiredOperation {
+			return true
+		}
+	}
+	return false
+}
+
 func (repo PsqlRepo) FindUserPermissions(userID uuid.UUID, requiredPermission entity.Permission) ([]entity.Permission, error) {
 	var permissions []entity.Permission
-	query := fmt.Sprintf(`
-		SELECT resource, resource_identifier, operation, effect
-		FROM %s.permissions
-		WHERE user_id = $1
-		AND resource = $2
-		AND operation = $3
-		AND resource_identifier = $4
-	`, repo.schema)
+	query := `
+        SELECT p.resource, p.resource_id, p.operations, p.effect
+        FROM auth.user_permissions up
+        JOIN auth.permissions p ON up.permission_id = p.id
+        WHERE up.user_id = $1
+        AND p.resource = $2
+        AND p.operation = $3
+        AND (p.resource_id = $4 OR p.resource_id = '*')
+    `
 
 	rows, err := repo.db.Query(query, userID, requiredPermission.Resource, requiredPermission.Operation, requiredPermission.ResourceIdentifier)
 	if err != nil {
@@ -348,5 +382,6 @@ func (repo PsqlRepo) FindUserPermissions(userID uuid.UUID, requiredPermission en
 		}
 		permissions = append(permissions, permission)
 	}
+
 	return permissions, nil
 }

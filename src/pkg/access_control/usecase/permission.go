@@ -7,9 +7,9 @@ import (
 	"github.com/google/uuid"
 )
 
-func (uc Usecase) CreatePermission(resourceID uuid.UUID, operation, effect string) (*entity.Permission, error) {
+func (uc Usecase) CreatePermission(resourceID string, resource uuid.UUID, operation []uuid.UUID, effect string) (*entity.Permission, error) {
 	const ErrFailedToCreatePermission = "FAILED_TO_CREATE_PERMISSION"
-	permission, err := uc.repo.CreatePermission(resourceID, operation, effect)
+	permission, err := uc.repo.CreatePermission(resourceID, resource, operation, effect)
 	if err != nil {
 		uc.log.Println("CREATE PERMISSION ERROR: Failed to create permission")
 		return nil, Error{
@@ -22,20 +22,18 @@ func (uc Usecase) CreatePermission(resourceID uuid.UUID, operation, effect strin
 	return permission, nil
 }
 
-
-func (uc Usecase) UpdatePermission(permissionID uuid.UUID, operation, effect string) (*entity.Permission, error) {
-			const ErrFailedToUpdatePermission = "FAILED_TO_UPDATE_PERMISSION"
-			permission, err := uc.repo.UpdatePermission(permissionID, operation, effect)
-			if err != nil {
-				uc.log.Println("UPDATE PERMISSION ERROR: Failed to update permission")
-				return nil, Error{
-					Type:    ErrFailedToUpdatePermission,
-					Message: err.Error(),
-				}
-			}
-			uc.log.Println("UPDATE PERMISSION SUCCESS: Permission successfully updated")
-			return permission, nil
-
+func (uc Usecase) UpdatePermission(permissionID uuid.UUID, resourceID string, resource uuid.UUID, operation []uuid.UUID, effect string) (*entity.Permission, error) {
+	const ErrFailedToUpdatePermission = "FAILED_TO_UPDATE_PERMISSION"
+	permission, err := uc.repo.UpdatePermission(permissionID, resourceID, resource, operation, effect)
+	if err != nil {
+		uc.log.Println("UPDATE PERMISSION ERROR: Failed to update permission")
+		return nil, Error{
+			Type:    ErrFailedToUpdatePermission,
+			Message: err.Error(),
+		}
+	}
+	uc.log.Println("UPDATE PERMISSION SUCCESS: Permission successfully updated")
+	return permission, nil
 }
 
 func (uc Usecase) DeletePermission(resourceID uuid.UUID, permissionID uuid.UUID) error {
@@ -63,6 +61,21 @@ func (uc Usecase) ListPermissions() ([]entity.Permission, error) {
 
 	uc.log.Println("LIST PERMISSIONS SUCCESS: Permissions successfully retrieved")
 	return permissions, nil
+}
+
+func (uc Usecase) ListUsers() ([]entity.User, error) {
+	const ErrFailedToListUsers = "FAILED_TO_LIST_USERS"
+	users, err := uc.repo.ListUsers()
+	if err != nil {
+		uc.log.Println("LIST USERS ERROR: Failed to retrieve users")
+		return nil, Error{
+			Type:    ErrFailedToListUsers,
+			Message: err.Error(),
+		}
+	}
+
+	uc.log.Println("LIST USERS SUCCESS: Users successfully retrieved")
+	return users, nil
 }
 
 func (uc Usecase) ListUserPermissions(userID uuid.UUID) ([]entity.Permission, error) {

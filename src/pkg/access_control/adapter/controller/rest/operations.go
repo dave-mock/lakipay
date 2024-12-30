@@ -2,17 +2,20 @@ package rest
 
 import (
 	"auth/src/pkg/auth/adapter/controller/procedure"
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
 	"github.com/google/uuid"
 )
 
-// -------------- Resource Management --------------
-func (controller Controller) CreateResource(w http.ResponseWriter, r *http.Request) {
-	controller.log.SetPrefix("[CONTROLLER] [CreateResource] ")
+// -------------- Operations Management --------------
+
+func (controller Controller) CreateOperations(w http.ResponseWriter, r *http.Request) {
+	controller.log.SetPrefix("[CONTROLLER] [CreateOperations] ")
 
 	authHeader := r.Header.Get("Authorization")
 	if len(strings.Split(authHeader, " ")) != 2 {
@@ -40,14 +43,12 @@ func (controller Controller) CreateResource(w http.ResponseWriter, r *http.Reque
 	}
 	fmt.Print(session)
 
-	type CreateResourcePayload struct {
-		Name        string      `json:"name"`
-		Operations  []uuid.UUID `json:"operations"`
-		Description string      `json:"description"`
+	var req struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
 	}
-
-	var req CreateResourcePayload
 	defer r.Body.Close()
+
 	decoder := json.NewDecoder(r.Body)
 	err = decoder.Decode(&req)
 	if err != nil {
@@ -62,12 +63,12 @@ func (controller Controller) CreateResource(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	resource, err := controller.interactor.CreateResource(req.Name, req.Description, req.Operations)
+	operations, err := controller.interactor.CreateOperations(req.Name, req.Description)
 	if err != nil {
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
-				Type:    "RESOURCE_CREATION_ERROR",
+				Type:    "Operations_CREATION_ERROR",
 				Message: err.Error(),
 			},
 		}, http.StatusInternalServerError)
@@ -76,12 +77,12 @@ func (controller Controller) CreateResource(w http.ResponseWriter, r *http.Reque
 
 	SendJSONResponse(w, Response{
 		Success: true,
-		Data:    resource,
+		Data:    operations,
 	}, http.StatusCreated)
 }
 
-func (controller Controller) UpdateResource(w http.ResponseWriter, r *http.Request) {
-	controller.log.SetPrefix("[CONTROLLER] [UpdateResource] ")
+func (controller Controller) UpdateOperations(w http.ResponseWriter, r *http.Request) {
+	controller.log.SetPrefix("[CONTROLLER] [UpdateOperations] ")
 
 	authHeader := r.Header.Get("Authorization")
 	if len(strings.Split(authHeader, " ")) != 2 {
@@ -109,15 +110,29 @@ func (controller Controller) UpdateResource(w http.ResponseWriter, r *http.Reque
 	}
 	fmt.Print(session)
 
-	type UpdateResourcePayload struct {
-		ResourceID  uuid.UUID   `json:"resource_id"`
-		Name        string      `json:"name"`
-		Operations  []uuid.UUID `json:"operations"`
-		Description string      `json:"description"`
+	var req struct {
+		OperationID string `json:"operation_id"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+	defer r.Body.Close()
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		controller.log.Println("Error reading request body:", err)
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "Error reading request body",
+			},
+		}, http.StatusBadRequest)
+		return
 	}
 
-	var req UpdateResourcePayload
-	defer r.Body.Close()
+	controller.log.Println("Raw Body:", string(body))
+
+	r.Body = io.NopCloser(bytes.NewReader(body))
 	decoder := json.NewDecoder(r.Body)
 	err = decoder.Decode(&req)
 	if err != nil {
@@ -132,36 +147,27 @@ func (controller Controller) UpdateResource(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if req.ResourceID == uuid.Nil {
-		controller.log.Println("Error: Invalid or missing resource_id")
+	controller.log.Println("Received OperationID", req.OperationID)
+	operationsUUID, err := uuid.Parse(req.OperationID)
+	if err != nil {
+		controller.log.Println("Error parsing operation_id:", err)
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
 				Type:    "INVALID_REQUEST",
-				Message: "resource_id is required and must be valid",
+				Message: "Invalid operation_id format",
 			},
 		}, http.StatusBadRequest)
 		return
 	}
-	controller.log.Printf("Received UpdateResource request with ResourceID %s", req.ResourceID)
-	resource, err := controller.interactor.UpdateResource(req.ResourceID, req.Name, req.Description, req.Operations)
-	if err != nil {
-		controller.log.Printf("Error updating resource: %v", err)
-		if strings.Contains(err.Error(), "does not exist") {
-			SendJSONResponse(w, Response{
-				Success: false,
-				Error: &Error{
-					Type:    "RESOURCE_NOT_FOUND",
-					Message: fmt.Sprintf("Resource with ID %s does not exist", req.ResourceID),
-				},
-			}, http.StatusNotFound)
-			return
-		}
 
+	operations, err := controller.interactor.UpdateOperations(operationsUUID, req.Name, req.Description)
+	if err != nil {
+		controller.log.Printf("Error updating operations: %v", err)
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
-				Type:    "RESOURCE_UPDATE_ERROR",
+				Type:    "Operations_UPDATE_ERROR",
 				Message: err.Error(),
 			},
 		}, http.StatusInternalServerError)
@@ -170,12 +176,12 @@ func (controller Controller) UpdateResource(w http.ResponseWriter, r *http.Reque
 
 	SendJSONResponse(w, Response{
 		Success: true,
-		Data:    resource,
+		Data:    operations,
 	}, http.StatusOK)
 }
 
-func (controller Controller) DeleteResource(w http.ResponseWriter, r *http.Request) {
-	controller.log.SetPrefix("[CONTROLLER] [DeleteResource] ")
+func (controller Controller) DeleteOperations(w http.ResponseWriter, r *http.Request) {
+	controller.log.SetPrefix("[CONTROLLER] [DeleteOperations] ")
 
 	authHeader := r.Header.Get("Authorization")
 	if len(strings.Split(authHeader, " ")) != 2 {
@@ -203,11 +209,9 @@ func (controller Controller) DeleteResource(w http.ResponseWriter, r *http.Reque
 	}
 	fmt.Print(session)
 
-	type DeleteResourcePayload struct {
-		ResourceID uuid.UUID `json:"resource_id"`
+	var req struct {
+		OperationsID string `json:"operation_id"`
 	}
-
-	var req DeleteResourcePayload
 	defer r.Body.Close()
 	decoder := json.NewDecoder(r.Body)
 	err = decoder.Decode(&req)
@@ -223,12 +227,39 @@ func (controller Controller) DeleteResource(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = controller.interactor.DeleteResource(req.ResourceID)
-	if err != nil {
+	controller.log.Println("Received OperationsID:", req.OperationsID)
+	if req.OperationsID == "" {
+		controller.log.Println("Error: OperationsID is empty")
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
-				Type:    "RESOURCE_DELETE_ERROR",
+				Type:    "INVALID_REQUEST",
+				Message: "OperationsID is empty",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	operationsUUID, err := uuid.Parse(req.OperationsID)
+	if err != nil {
+		controller.log.Println("Error parsing operations_id:", err)
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "Invalid operations_id format",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	err = controller.interactor.DeleteOperations(operationsUUID)
+	if err != nil {
+		controller.log.Printf("Error deleting operation: %v", err)
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "Operations_DELETE_ERROR",
 				Message: err.Error(),
 			},
 		}, http.StatusInternalServerError)
@@ -237,12 +268,12 @@ func (controller Controller) DeleteResource(w http.ResponseWriter, r *http.Reque
 
 	SendJSONResponse(w, Response{
 		Success: true,
-		Data:    "Resource deleted successfully",
+		Data:    "Operation deleted successfully",
 	}, http.StatusOK)
 }
 
-func (controller Controller) GetSingleResource(w http.ResponseWriter, r *http.Request) {
-	controller.log.SetPrefix("[CONTROLLER] [GetSingleResource] ")
+func (controller Controller) GetSingleOperations(w http.ResponseWriter, r *http.Request) {
+	controller.log.SetPrefix("[CONTROLLER] [GetSingleOperations] ")
 
 	authHeader := r.Header.Get("Authorization")
 	if len(strings.Split(authHeader, " ")) != 2 {
@@ -270,12 +301,11 @@ func (controller Controller) GetSingleResource(w http.ResponseWriter, r *http.Re
 	}
 	fmt.Print(session)
 
-	type GetResourcePayload struct {
-		ResourceID uuid.UUID `json:"resource_id"`
+	var req struct {
+		OperationsID uuid.UUID `json:"operations_id"`
 	}
-
-	var req GetResourcePayload
 	defer r.Body.Close()
+
 	decoder := json.NewDecoder(r.Body)
 	err = decoder.Decode(&req)
 	if err != nil {
@@ -290,12 +320,12 @@ func (controller Controller) GetSingleResource(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	resource, err := controller.interactor.GetResourceByID(req.ResourceID)
+	operations, err := controller.interactor.GetOperationsByID(req.OperationsID)
 	if err != nil {
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
-				Type:    "RESOURCE_NOT_FOUND",
+				Type:    "Operations_NOT_FOUND",
 				Message: err.Error(),
 			},
 		}, http.StatusNotFound)
@@ -304,12 +334,12 @@ func (controller Controller) GetSingleResource(w http.ResponseWriter, r *http.Re
 
 	SendJSONResponse(w, Response{
 		Success: true,
-		Data:    resource,
+		Data:    operations,
 	}, http.StatusOK)
 }
 
-func (controller Controller) ListAllResources(w http.ResponseWriter, r *http.Request) {
-	controller.log.SetPrefix("[CONTROLLER] [ListAllResources] ")
+func (controller Controller) ListAllOperations(w http.ResponseWriter, r *http.Request) {
+	controller.log.SetPrefix("[CONTROLLER] [ListAllOperations] ")
 
 	authHeader := r.Header.Get("Authorization")
 	if len(strings.Split(authHeader, " ")) != 2 {
@@ -337,12 +367,12 @@ func (controller Controller) ListAllResources(w http.ResponseWriter, r *http.Req
 	}
 	fmt.Print(session)
 
-	resources, err := controller.interactor.ListResources()
+	operations, err := controller.interactor.ListOperations()
 	if err != nil {
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
-				Type:    "RESOURCE_LIST_ERROR",
+				Type:    "Operations_LIST_ERROR",
 				Message: err.Error(),
 			},
 		}, http.StatusInternalServerError)
@@ -351,6 +381,6 @@ func (controller Controller) ListAllResources(w http.ResponseWriter, r *http.Req
 
 	SendJSONResponse(w, Response{
 		Success: true,
-		Data:    resources,
+		Data:    operations,
 	}, http.StatusOK)
 }

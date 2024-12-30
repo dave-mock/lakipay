@@ -4,6 +4,7 @@ import (
 	"auth/src/pkg/auth/adapter/controller/procedure"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -14,9 +15,9 @@ import (
 
 func (controller Controller) CreatePermission(w http.ResponseWriter, r *http.Request) {
 	controller.log.SetPrefix("[CONTROLLER] [CreatePermission] ")
-
 	authHeader := r.Header.Get("Authorization")
 	if len(strings.Split(authHeader, " ")) != 2 {
+		controller.log.Println("Authentication token missing in header.")
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
@@ -30,6 +31,7 @@ func (controller Controller) CreatePermission(w http.ResponseWriter, r *http.Req
 	token := strings.Split(authHeader, " ")[1]
 	session, err := controller.auth.GetCheckAuth(token)
 	if err != nil {
+		controller.log.Printf("Authentication failed: %v\n", err)
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
@@ -39,19 +41,33 @@ func (controller Controller) CreatePermission(w http.ResponseWriter, r *http.Req
 		}, http.StatusUnauthorized)
 		return
 	}
-	fmt.Print(session)
-	type CreatePermissionPayload struct {
-		ResourceID uuid.UUID `json:"resource_id"`
-		Operation  string    `json:"operation"`
-		Effect     string    `json:"effect"`
+
+	controller.log.Printf("||||||||||| Auth session %+v\n", session)
+
+	var req struct {
+		ResourceID string      `json:"resource_id"`
+		Resource   uuid.UUID   `json:"resource"`
+		Operation  []uuid.UUID `json:"operations"`
+		Effect     string      `json:"effect"`
 	}
 
-	var req CreatePermissionPayload
-	defer r.Body.Close()
-	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&req)
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		controller.log.Println("Error decoding request:", err)
+		controller.log.Printf("Error reading body %v\n", err)
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "Error reading body.",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	controller.log.Printf("Raw body: %s\n", string(body))
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		controller.log.Printf("Error decoding request body %v\n", err)
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
@@ -62,8 +78,22 @@ func (controller Controller) CreatePermission(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	permission, err := controller.interactor.CreatePermission(req.ResourceID, req.Operation, req.Effect)
+	controller.log.Printf("Decoded request %+v\n", req)
+	if len(req.Operation) == 0 {
+		controller.log.Println("Operations array is empty")
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "Operations cannot be empty.",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	permission, err := controller.interactor.CreatePermission(req.ResourceID, req.Resource, req.Operation, req.Effect)
 	if err != nil {
+		controller.log.Printf("Error creating permission: %v\n", err)
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
@@ -73,6 +103,8 @@ func (controller Controller) CreatePermission(w http.ResponseWriter, r *http.Req
 		}, http.StatusInternalServerError)
 		return
 	}
+
+	controller.log.Printf("Created permission %+v\n", permission)
 
 	SendJSONResponse(w, Response{
 		Success: true,
@@ -107,19 +139,34 @@ func (controller Controller) UpdatePermission(w http.ResponseWriter, r *http.Req
 		}, http.StatusUnauthorized)
 		return
 	}
-	fmt.Print(session)
-	type UpdatePermissionPayload struct {
-		ResourceID uuid.UUID `json:"resource_id"`
-		Operation  string    `json:"operation"`
-		Effect     string    `json:"effect"`
+
+	fmt.Println(session)
+
+	var req struct {
+		PermissionID uuid.UUID   `json:"permission_id"`
+		ResourceID   string      `json:"resource_id"`
+		Resource     uuid.UUID   `json:"resource"`
+		Operations   []uuid.UUID `json:"operations"`
+		Effect       string      `json:"effect"`
 	}
 
-	var req UpdatePermissionPayload
-	defer r.Body.Close()
-	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&req)
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		controller.log.Println("Error decoding request:", err)
+		controller.log.Printf("Error reading body %v\n", err)
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "Error reading body.",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	controller.log.Printf("Raw body: %s\n", string(body))
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		controller.log.Printf("Error decoding request body %v\n", err)
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
@@ -130,7 +177,20 @@ func (controller Controller) UpdatePermission(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	permission, err := controller.interactor.CreatePermission(req.ResourceID, req.Operation, req.Effect) // Assuming UpdatePermission
+	controller.log.Printf("Decoded request %+v\n", req)
+	if len(req.Operations) == 0 {
+		controller.log.Println("Operations array is empty")
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "Operations cannot be empty.",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	permission, err := controller.interactor.UpdatePermission(req.PermissionID, req.ResourceID, req.Resource, req.Operations, req.Effect)
 	if err != nil {
 		SendJSONResponse(w, Response{
 			Success: false,
@@ -175,7 +235,9 @@ func (controller Controller) GetSinglePermission(w http.ResponseWriter, r *http.
 		}, http.StatusUnauthorized)
 		return
 	}
-	fmt.Print(session)
+
+	fmt.Println(session)
+
 	permissions, err := controller.interactor.ListPermissions()
 	if err != nil {
 		SendJSONResponse(w, Response{
@@ -221,7 +283,9 @@ func (controller Controller) ListPermissions(w http.ResponseWriter, r *http.Requ
 		}, http.StatusUnauthorized)
 		return
 	}
-	fmt.Print(session)
+
+	fmt.Println(session)
+
 	permissions, err := controller.interactor.ListPermissions()
 	if err != nil {
 		SendJSONResponse(w, Response{
@@ -242,6 +306,7 @@ func (controller Controller) ListPermissions(w http.ResponseWriter, r *http.Requ
 
 func (controller Controller) DeletePermission(w http.ResponseWriter, r *http.Request) {
 	controller.log.SetPrefix("[CONTROLLER] [DeletePermission] ")
+
 	authHeader := r.Header.Get("Authorization")
 	if len(strings.Split(authHeader, " ")) != 2 {
 		SendJSONResponse(w, Response{
@@ -266,13 +331,14 @@ func (controller Controller) DeletePermission(w http.ResponseWriter, r *http.Req
 		}, http.StatusUnauthorized)
 		return
 	}
-	fmt.Print(session)
-	type DeletePermissionPayload struct {
+
+	fmt.Println(session)
+
+	var req struct {
 		ResourceID   string `json:"resource_id"`
 		PermissionID string `json:"permission_id"`
 	}
 
-	var req DeletePermissionPayload
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		controller.log.Println("Error decoding request:", err)

@@ -144,12 +144,9 @@ func (controller Controller) CreateProduct(w http.ResponseWriter, r *http.Reques
 		Message: "Product created successfully.",
 	}, http.StatusCreated)
 }
-
 func (controller Controller) ListProducts(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("||||||| || handle List Products Request ||||||||")
 	controller.log.Println("Processing List Products Request")
-
-	// Check for Authorization header
 	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
 		SendJSONResponse(w, Response{
 			Success: false,
@@ -171,6 +168,24 @@ func (controller Controller) ListProducts(w http.ResponseWriter, r *http.Request
 				Message: err.Error(),
 			},
 		}, http.StatusUnauthorized)
+		return
+	}
+	requiredPermission := entity.Permission{
+		Resource:           "Users",                 // Resource to access
+		Operation:          "create",                // Operation to perform (create)
+		ResourceIdentifier: "/users/profile/update", // Specific resource identifier
+		Effect:             "allow",                 // Effect ("allow" or "deny")
+	}
+
+	hasPermission, err := controller.auth.HasPermission(session.User.Id, requiredPermission)
+	if err != nil || !hasPermission {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "FORBIDDEN",
+				Message: "You do not have permission to read users' profile information.",
+			},
+		}, http.StatusForbidden)
 		return
 	}
 

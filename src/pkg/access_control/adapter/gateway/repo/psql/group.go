@@ -4,6 +4,7 @@ import (
 	"auth/src/pkg/access_control/core/entity"
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -17,7 +18,7 @@ func (repo PsqlRepo) CreateGroup(title string) (*entity.Group, error) {
 	var group entity.Group
 	err := repo.db.QueryRow(query, title).Scan(&group.ID, &group.Title, &group.CreatedAt, &group.UpdatedAt)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create group: %v", err)
+		return nil, fmt.Errorf("failed to create group %v", err)
 	}
 	return &group, nil
 }
@@ -32,7 +33,7 @@ func (repo PsqlRepo) UpdateGroup(groupID uuid.UUID, title string) (*entity.Group
 	var group entity.Group
 	err := repo.db.QueryRow(query, title, groupID).Scan(&group.ID, &group.Title, &group.CreatedAt, &group.UpdatedAt)
 	if err != nil {
-		return nil, fmt.Errorf("failed to update group: %v", err)
+		return nil, fmt.Errorf("failed to update group %v", err)
 	}
 	return &group, nil
 }
@@ -44,29 +45,40 @@ func (repo PsqlRepo) DeleteGroup(groupID uuid.UUID) error {
 	`
 	_, err := repo.db.Exec(query, groupID)
 	if err != nil {
-		return fmt.Errorf("failed to delete group: %v", err)
+		return fmt.Errorf("failed to delete group %v", err)
 	}
 	return nil
 }
 
 func (repo PsqlRepo) ListGroups() ([]entity.Group, error) {
 	const query = `
-		SELECT id, title, created_at, updated_at
-		FROM auth.groups
+		SELECT g.id, g.title, g.created_at, g.updated_at,
+		       COUNT(ug.user_id) AS member_count
+		FROM auth.groups g
+		LEFT JOIN auth.user_groups ug ON g.id = ug.group_id
+		GROUP BY g.id
 	`
+
 	rows, err := repo.db.Query(query)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list groups: %v", err)
+		return nil, fmt.Errorf("failed to list groups %v", err)
 	}
 	defer rows.Close()
 
 	var groups []entity.Group
 	for rows.Next() {
 		var group entity.Group
-		if err := rows.Scan(&group.ID, &group.Title, &group.CreatedAt, &group.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan group: %v", err)
+		var memberCount int
+		if err := rows.Scan(&group.ID, &group.Title, &group.CreatedAt, &group.UpdatedAt, &memberCount); err != nil {
+			return nil, fmt.Errorf("failed to scan group %v", err)
 		}
+
+		group.Members = memberCount
 		groups = append(groups, group)
+	}
+
+	if len(groups) == 0 {
+		return nil, fmt.Errorf("no groups found")
 	}
 
 	return groups, nil
@@ -81,7 +93,7 @@ func (repo PsqlRepo) AddUserToGroup(userID, groupID uuid.UUID) error {
 	if err == sql.ErrNoRows {
 		return fmt.Errorf("user with ID %v does not exist", userID)
 	} else if err != nil {
-		return fmt.Errorf("failed to check if user exists: %v", err)
+		return fmt.Errorf("failed to check if user exists %v", err)
 	}
 
 	const groupExistsQuery = `
@@ -101,7 +113,7 @@ func (repo PsqlRepo) AddUserToGroup(userID, groupID uuid.UUID) error {
 	var userInGroup bool
 	err = repo.db.QueryRow(userInGroupQuery, userID, groupID).Scan(&userInGroup)
 	if err != nil && err != sql.ErrNoRows {
-		return fmt.Errorf("failed to check if user is already in group: %v", err)
+		return fmt.Errorf("failed to check if user is already in group %v", err)
 	}
 	if userInGroup {
 		return fmt.Errorf("user with ID %v is already in group with ID %v", userID, groupID)
@@ -140,7 +152,6 @@ func (repo PsqlRepo) RemoveUserFromGroup(userID, groupID uuid.UUID) error {
 }
 
 func (repo PsqlRepo) ListGroupUsers(groupID uuid.UUID) ([]entity.User, error) {
-
 	const groupExistsQuery = `
 		SELECT 1 FROM auth.groups WHERE id = $1
 	`
@@ -161,16 +172,41 @@ func (repo PsqlRepo) ListGroupUsers(groupID uuid.UUID) ([]entity.User, error) {
 	`
 	rows, err := repo.db.Query(query, groupID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list group users: %v", err)
+		return nil, fmt.Errorf("failed to list group users %v", err)
 	}
 	defer rows.Close()
 
 	var users []entity.User
 	for rows.Next() {
 		var user entity.User
-		if err := rows.Scan(&user.Id, &user.SirName, &user.FirstName, &user.LastName, &user.Gender, &user.DateOfBirth, &user.UserType, &user.CreatedAt, &user.UpdatedAt); err != nil {
+		var gender sql.NullString
+		var dateOfBirth sql.NullTime
+
+		if err := rows.Scan(
+			&user.Id,
+			&user.SirName,
+			&user.FirstName,
+			&user.LastName,
+			&gender,
+			&dateOfBirth,
+			&user.UserType,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		); err != nil {
 			return nil, fmt.Errorf("failed to scan user: %v", err)
 		}
+
+		user.Gender = entity.Gender(gender.String)
+		if !gender.Valid {
+			user.Gender = ""
+		}
+
+		if dateOfBirth.Valid {
+			user.DateOfBirth = dateOfBirth.Time
+		} else {
+			user.DateOfBirth = time.Time{}
+		}
+
 		users = append(users, user)
 	}
 
@@ -203,7 +239,7 @@ func (repo PsqlRepo) ListUserGroups(userID uuid.UUID) ([]entity.Group, error) {
 	`
 	rows, err := repo.db.Query(query, userID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list user groups: %v", err)
+		return nil, fmt.Errorf("failed to list user groups %v", err)
 	}
 	defer rows.Close()
 
@@ -211,7 +247,7 @@ func (repo PsqlRepo) ListUserGroups(userID uuid.UUID) ([]entity.Group, error) {
 	for rows.Next() {
 		var group entity.Group
 		if err := rows.Scan(&group.ID, &group.Title, &group.CreatedAt, &group.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan group: %v", err)
+			return nil, fmt.Errorf("failed to scan group %v", err)
 		}
 		groups = append(groups, group)
 	}

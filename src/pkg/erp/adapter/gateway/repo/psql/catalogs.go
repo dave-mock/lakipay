@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// method for storing a catalog in PostgreSQL
 func (repo PsqlRepo) CreateCatalog(userId uuid.UUID, name string, description string, status string) (*entity.Catalog, error) {
 	tx, err := repo.db.BeginTx(context.Background(), nil)
 	if err != nil {
@@ -16,7 +15,6 @@ func (repo PsqlRepo) CreateCatalog(userId uuid.UUID, name string, description st
 		return nil, err
 	}
 
-	// Generate the catalog ID
 	catalogId := uuid.New()
 	err = repo.db.QueryRow(`INSERT INTO erp.catalogs (id, merchant_id, name, description, status, created_at, updated_at, created_by, updated_by)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -28,14 +26,12 @@ func (repo PsqlRepo) CreateCatalog(userId uuid.UUID, name string, description st
 		return nil, err
 	}
 
-	// Commit the transaction
 	if err := tx.Commit(); err != nil {
 		repo.log.Println("CREATE CATALOG ERROR: Failed to commit transaction")
 		tx.Rollback()
 		return nil, err
 	}
 
-	// Return the created catalog
 	catalog := &entity.Catalog{
 		Id:          catalogId,
 		MerchantId:  userId,
@@ -52,7 +48,6 @@ func (repo PsqlRepo) CreateCatalog(userId uuid.UUID, name string, description st
 	return catalog, nil
 }
 
-// method for retrieving catalogs of a specific merchant
 func (repo PsqlRepo) ListMerchantCatalogs(merchantID string, userId uuid.UUID) ([]entity.Catalog, error) {
 	var catalogs []entity.Catalog
 
@@ -84,7 +79,6 @@ func (repo PsqlRepo) ListMerchantCatalogs(merchantID string, userId uuid.UUID) (
 	return catalogs, nil
 }
 
-// method for listing all catalogs of a user
 func (repo PsqlRepo) ListCatalogs(userId uuid.UUID) ([]entity.Catalog, error) {
 	var catalogs []entity.Catalog
 	rows, err := repo.db.Query(`
@@ -116,7 +110,6 @@ func (repo PsqlRepo) ListCatalogs(userId uuid.UUID) ([]entity.Catalog, error) {
 	return catalogs, nil
 }
 
-// method for retrieving a catalog by ID
 func (repo PsqlRepo) GetCatalog(catalogID string, userId uuid.UUID) (*entity.Catalog, error) {
 	var catalog entity.Catalog
 
@@ -152,18 +145,14 @@ func (repo PsqlRepo) ArchiveCatalog(catalogID string, userId uuid.UUID) error {
 	return nil
 }
 
-// method for updating catalog details
 func (repo PsqlRepo) UpdateCatalog(userId uuid.UUID, catalogID, name, description, status string) (*entity.Catalog, error) {
 	repo.log.Println("Updating Catalog")
-
-	// Start a new transaction
 	tx, err := repo.db.BeginTx(context.Background(), nil)
 	if err != nil {
 		repo.log.Println("UPDATE CATALOG ERROR: Failed to start transaction")
 		return nil, err
 	}
 
-	// Update the catalog information and immediately retrieve the updated data
 	var updatedCatalog entity.Catalog
 	err = repo.db.QueryRow(`
 		UPDATE erp.catalogs
@@ -178,8 +167,6 @@ func (repo PsqlRepo) UpdateCatalog(userId uuid.UUID, catalogID, name, descriptio
 		tx.Rollback()
 		return nil, err
 	}
-
-	// Commit the transaction
 	err = tx.Commit()
 	if err != nil {
 		repo.log.Println("UPDATE CATALOG ERROR: Failed to commit transaction")
@@ -191,7 +178,6 @@ func (repo PsqlRepo) UpdateCatalog(userId uuid.UUID, catalogID, name, descriptio
 	return &updatedCatalog, nil
 }
 
-// method for deleting a catalog
 func (repo PsqlRepo) DeleteCatalog(catalogID string, userId uuid.UUID) error {
 	_, err := repo.db.Exec(`
 		DELETE FROM erp.catalogs

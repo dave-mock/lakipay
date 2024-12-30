@@ -143,6 +143,12 @@ func New(log *log.Logger, interactor usecase.Interactor, sm *http.ServeMux, auth
 			controller.GetUserGroups(w, r)
 		}
 	})
+	sm.HandleFunc("/groups/users/list-users", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			controller.GetGroupUsers(w, r)
+		}
+	})
 
 	// User-Permission Assignments
 	sm.HandleFunc("/user/user-permissions/assign", func(w http.ResponseWriter, r *http.Request) {
@@ -208,13 +214,44 @@ func New(log *log.Logger, interactor usecase.Interactor, sm *http.ServeMux, auth
 			controller.ListAllResources(w, r)
 		}
 	})
+
+	sm.HandleFunc("/user/operations/add", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			controller.CreateOperations(w, r)
+		}
+	})
+	sm.HandleFunc("/user/operations/update", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			controller.UpdateOperations(w, r)
+		}
+	})
+	sm.HandleFunc("/user/operations/delete", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			controller.DeleteOperations(w, r)
+		}
+	})
+	sm.HandleFunc("/user/operations/list", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			controller.ListAllOperations(w, r)
+		}
+	})
+
 	sm.HandleFunc("/user/resources/view", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
 			controller.GetSingleResource(w, r)
 		}
 	})
-
+	sm.HandleFunc("/account/users/list", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			controller.GetUsersList(w, r)
+		}
+	})
 	return controller
 }
 

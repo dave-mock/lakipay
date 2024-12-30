@@ -17,7 +17,7 @@ func (repo PsqlRepo) GrantPermissionToUser(userID uuid.UUID, permissionID uuid.U
 		return fmt.Errorf("user with ID %s does not exist", userID)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to check if user exists: %v", err)
+		return fmt.Errorf("failed to check if user exists %v", err)
 	}
 
 	const checkPermissionQuery = `
@@ -29,7 +29,7 @@ func (repo PsqlRepo) GrantPermissionToUser(userID uuid.UUID, permissionID uuid.U
 		return fmt.Errorf("permission with ID %s does not exist", permissionID)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to check if permission exists: %v", err)
+		return fmt.Errorf("failed to check if permission exists %v", err)
 	}
 
 	const checkPermissionGrantedQuery = `
@@ -40,7 +40,7 @@ func (repo PsqlRepo) GrantPermissionToUser(userID uuid.UUID, permissionID uuid.U
 	err = repo.db.QueryRow(checkPermissionGrantedQuery, userID, permissionID).Scan(&exists)
 	if err == sql.ErrNoRows {
 	} else if err != nil {
-		return fmt.Errorf("failed to check permission existence: %v", err)
+		return fmt.Errorf("failed to check permission existence %v", err)
 	} else {
 		return fmt.Errorf("permission with ID %s is already granted to user with ID %s", permissionID, userID)
 	}
@@ -51,7 +51,7 @@ func (repo PsqlRepo) GrantPermissionToUser(userID uuid.UUID, permissionID uuid.U
 	`
 	_, err = repo.db.Exec(grantPermissionQuery, userID, permissionID)
 	if err != nil {
-		return fmt.Errorf("failed to grant permission to user: %v", err)
+		return fmt.Errorf("failed to grant permission to user %v", err)
 	}
 
 	return nil
@@ -99,7 +99,7 @@ func (repo PsqlRepo) RevokePermissionFromUser(userID uuid.UUID, permissionID uui
 		if err == sql.ErrNoRows {
 			return fmt.Errorf("permission does not exist for user with ID %v", userID)
 		}
-		return fmt.Errorf("failed to check user-permission existence: %v", err)
+		return fmt.Errorf("failed to check user-permission existence %v", err)
 	}
 
 	const revokeQuery = `
@@ -108,7 +108,7 @@ func (repo PsqlRepo) RevokePermissionFromUser(userID uuid.UUID, permissionID uui
     `
 	_, err = repo.db.Exec(revokeQuery, userID, permissionID)
 	if err != nil {
-		return fmt.Errorf("failed to revoke permission from user: %v", err)
+		return fmt.Errorf("failed to revoke permission from user %v", err)
 	}
 
 	return nil
@@ -124,7 +124,7 @@ func (repo PsqlRepo) GrantPermissionToGroup(groupID uuid.UUID, permissionID uuid
 		return fmt.Errorf("group with ID %s does not exist", groupID)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to check if group exists: %v", err)
+		return fmt.Errorf("failed to check if group exists %v", err)
 	}
 
 	const checkPermissionQuery = `
@@ -136,7 +136,7 @@ func (repo PsqlRepo) GrantPermissionToGroup(groupID uuid.UUID, permissionID uuid
 		return fmt.Errorf("permission with ID %s does not exist", permissionID)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to check if permission exists: %v", err)
+		return fmt.Errorf("failed to check if permission exists %v", err)
 	}
 
 	const checkPermissionGrantedQuery = `
@@ -147,7 +147,7 @@ func (repo PsqlRepo) GrantPermissionToGroup(groupID uuid.UUID, permissionID uuid
 	err = repo.db.QueryRow(checkPermissionGrantedQuery, groupID, permissionID).Scan(&exists)
 	if err == sql.ErrNoRows {
 	} else if err != nil {
-		return fmt.Errorf("failed to check permission existence: %v", err)
+		return fmt.Errorf("failed to check permission existence %v", err)
 	} else {
 		return fmt.Errorf("permission with ID %s is already granted to group with ID %s", permissionID, groupID)
 	}
@@ -158,7 +158,7 @@ func (repo PsqlRepo) GrantPermissionToGroup(groupID uuid.UUID, permissionID uuid
 	`
 	_, err = repo.db.Exec(grantPermissionQuery, groupID, permissionID)
 	if err != nil {
-		return fmt.Errorf("failed to grant permission to group: %v", err)
+		return fmt.Errorf("failed to grant permission to group %v", err)
 	}
 	return nil
 }
@@ -173,7 +173,7 @@ func (repo PsqlRepo) RevokePermissionFromGroup(groupID uuid.UUID, permissionID u
 		return fmt.Errorf("group with ID %s does not exist", groupID)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to check if group exists: %v", err)
+		return fmt.Errorf("failed to check if group exists %v", err)
 	}
 
 	const checkPermissionQuery = `
@@ -185,7 +185,7 @@ func (repo PsqlRepo) RevokePermissionFromGroup(groupID uuid.UUID, permissionID u
 		return fmt.Errorf("permission with ID %s does not exist", permissionID)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to check if permission exists: %v", err)
+		return fmt.Errorf("failed to check if permission exists %v", err)
 	}
 
 	const checkPermissionAssignmentQuery = `
@@ -198,7 +198,7 @@ func (repo PsqlRepo) RevokePermissionFromGroup(groupID uuid.UUID, permissionID u
 		return fmt.Errorf("permission with ID %s is not assigned to group with ID %s", permissionID, groupID)
 	}
 	if err != nil {
-		return fmt.Errorf("failed to check permission assignment: %v", err)
+		return fmt.Errorf("failed to check permission assignment %v", err)
 	}
 
 	const query = `
@@ -207,7 +207,7 @@ func (repo PsqlRepo) RevokePermissionFromGroup(groupID uuid.UUID, permissionID u
 	`
 	_, err = repo.db.Exec(query, groupID, permissionID)
 	if err != nil {
-		return fmt.Errorf("failed to revoke permission from group: %v", err)
+		return fmt.Errorf("failed to revoke permission from group %v", err)
 	}
 	return nil
 }

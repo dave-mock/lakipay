@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (uc Usecase) CreateResource(name, description string) (*entity.Resource, error) {
+func (uc Usecase) CreateResource(name, description string, operations []uuid.UUID) (*entity.Resource, error) {
 	const ErrFailedToCreateResource = "FAILED_TO_CREATE_RESOURCE"
 	if name == "" {
 		uc.log.Println("CREATE RESOURCE ERROR: Invalid name")
@@ -24,7 +24,7 @@ func (uc Usecase) CreateResource(name, description string) (*entity.Resource, er
 		}
 	}
 
-	resource, err := uc.repo.CreateResource(name, description)
+	resource, err := uc.repo.CreateResource(name, description, operations)
 	if err != nil {
 		uc.log.Println("CREATE RESOURCE ERROR: Failed to create resource")
 		return nil, Error{
@@ -37,7 +37,7 @@ func (uc Usecase) CreateResource(name, description string) (*entity.Resource, er
 	return resource, nil
 }
 
-func (uc Usecase) UpdateResource(resourceID uuid.UUID, name, description string) (*entity.Resource, error) {
+func (uc Usecase) UpdateResource(resourceID uuid.UUID, name, description string, operations []uuid.UUID) (*entity.Resource, error) {
 	const ErrFailedToUpdateResource = "FAILED_TO_UPDATE_RESOURCE"
 
 	if name == "" {
@@ -66,7 +66,7 @@ func (uc Usecase) UpdateResource(resourceID uuid.UUID, name, description string)
 
 	resource.Name = name
 	resource.Description = description
-	updatedResource, err := uc.repo.UpdateResource(resourceID, name, description)
+	updatedResource, err := uc.repo.UpdateResource(resourceID, name, description, operations)
 	if err != nil {
 		uc.log.Println("UPDATE RESOURCE ERROR |||| Failed to update resource")
 		return nil, Error{

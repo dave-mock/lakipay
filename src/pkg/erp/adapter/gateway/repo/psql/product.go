@@ -44,10 +44,9 @@ func (repo PsqlRepo) ListProducts(userID uuid.UUID, userType string) ([]entity.P
 			repo.log.Println("ERROR LISTING PRODUCTS:", err)
 			return nil, err
 		}
-		defer rows.Close() // Ensure rows are closed after use
+		defer rows.Close()
 	}
 
-	// Iterate through the rows and scan data into the products slice
 	for rows.Next() {
 		var product entity.Product
 		err := rows.Scan(
@@ -74,7 +73,6 @@ func (repo PsqlRepo) ListProducts(userID uuid.UUID, userType string) ([]entity.P
 		products = append(products, product)
 	}
 
-	// Check for any row iteration errors
 	if err := rows.Err(); err != nil {
 		repo.log.Println("ERROR IN ROWS:", err)
 		return nil, err
