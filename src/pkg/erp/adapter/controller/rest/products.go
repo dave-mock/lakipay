@@ -144,21 +144,25 @@ func (controller Controller) CreateProduct(w http.ResponseWriter, r *http.Reques
 		Message: "Product created successfully.",
 	}, http.StatusCreated)
 }
+
 func (controller Controller) ListProducts(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("||||||| || handle List Products Request ||||||||")
 	controller.log.Println("Processing List Products Request")
-	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
+	authHeader := r.Header.Get("Authorization")
+	authParts := strings.Split(authHeader, " ")
+	if len(authParts) != 2 || authParts[0] != "Bearer" {
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
 				Type:    "UNAUTHORIZED",
-				Message: "Please provide an authentication token in header",
+				Message: "Please provide a valid authentication token in the header",
 			},
 		}, http.StatusUnauthorized)
 		return
 	}
 
-	token := strings.Split(r.Header.Get("Authorization"), " ")[1]
+	token := authParts[1]
+
 	session, err := controller.auth.GetCheckAuth(token)
 	if err != nil {
 		SendJSONResponse(w, Response{
@@ -170,27 +174,31 @@ func (controller Controller) ListProducts(w http.ResponseWriter, r *http.Request
 		}, http.StatusUnauthorized)
 		return
 	}
+
+	userID := session.User.Id
+
 	requiredPermission := entity.Permission{
-		Resource:           "Users",                 // Resource to access
-		Operation:          "create",                // Operation to perform (create)
-		ResourceIdentifier: "/users/profile/update", // Specific resource identifier
-		Effect:             "allow",                 // Effect ("allow" or "deny")
+		Resource:           "Users",
+		Operation:          "create",
+		ResourceIdentifier: "/users/profile/update",
+		Effect:             "deny",
 	}
 
-	hasPermission, err := controller.auth.HasPermission(session.User.Id, requiredPermission)
+	hasPermission, err := controller.auth.HasPermission(userID, requiredPermission)
 	if err != nil || !hasPermission {
 		SendJSONResponse(w, Response{
 			Success: false,
 			Error: &Error{
 				Type:    "FORBIDDEN",
-				Message: "You do not have permission to read users' profile information.",
+				Message: "You do not have permission to perform this operation.",
 			},
 		}, http.StatusForbidden)
 		return
 	}
 
+	// Step 5: Retrieve and return the list of products
 	userType := session.User.UserType
-	products, err := controller.interactor.ListProducts(session.User.Id, userType)
+	products, err := controller.interactor.ListProducts(userID, userType)
 	if err != nil {
 		switch err := err.(type) {
 		case usecase.Error:
