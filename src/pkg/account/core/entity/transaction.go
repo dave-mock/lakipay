@@ -23,6 +23,7 @@ const (
 	LAKIPAY     TransactionMedium = "LAKIPAY"
 	CYBERSOURCE TransactionMedium = "CYBERSOURCE"
 	ETHSWITCH   TransactionMedium = "ETHSWITCH"
+	MPESA       TransactionMedium = "MPESA"
 )
 
 type Transaction struct {
@@ -79,7 +80,6 @@ type MerchantKeys struct {
 type P2p struct {
 	Amount float64
 }
-
 type BatchTransaction struct {
 	Id   uuid.UUID
 	From []struct {

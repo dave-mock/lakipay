@@ -39,6 +39,7 @@ type User struct {
 	SirName   string    `json:"sir_name"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
+	UserType  string    `json:"user_type"`
 }
 
 func New(log *log.Logger, sm *http.ServeMux, interactor usecase.Interactor) Controller {
@@ -91,10 +92,10 @@ func New(log *log.Logger, sm *http.ServeMux, interactor usecase.Interactor) Cont
 	})
 
 	sm.HandleFunc("/get-decrypt-data", func(w http.ResponseWriter, r *http.Request) {
-		
-		fmt.Print("_______________________",r.Method)
+
+		fmt.Print("_______________________", r.Method)
 		switch r.Method {
-		
+
 		case http.MethodPost:
 			{
 				controller.GetDecryptData(w, r)

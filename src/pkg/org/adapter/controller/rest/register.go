@@ -33,5 +33,5 @@ func (controller Controller) GetRegisterOrganization(w http.ResponseWriter, r *h
 
 func (controller Controller) GetInitOrgRegistration(w http.ResponseWriter, r *http.Request) {
 	// time.Sleep(10 * time.Second)
-	http.Redirect(w, r, "http://127.0.0.1:3000", http.StatusSeeOther)
+	http.Redirect(w, r, "http://0.0.0.0:3000", http.StatusSeeOther)
 }

@@ -120,11 +120,13 @@ func (controller Controller) GetSet2FA(w http.ResponseWriter, r *http.Request) {
 				SirName   string    "json:\"sir_name,omitempty\""
 				FirstName string    "json:\"first_name\""
 				LastName  string    "json:\"last_name,omitempty\""
+				UserType  string    "json:\"user_type,omitempty\""
 			}{
 				Id:        session.User.Id,
 				SirName:   session.User.SirName,
 				FirstName: session.User.FirstName,
 				LastName:  session.User.LastName,
+				UserType:  session.User.UserType,
 			},
 		},
 	}, http.StatusOK)
@@ -236,22 +238,23 @@ func (controller Controller) GetCheck2FA(w http.ResponseWriter, r *http.Request)
 				SirName   string    "json:\"sir_name,omitempty\""
 				FirstName string    "json:\"first_name\""
 				LastName  string    "json:\"last_name,omitempty\""
+				UserType  string    "json:\"user_type,omitempty\""
 			}{
 				Id:        session.User.Id,
 				SirName:   session.User.SirName,
 				FirstName: session.User.FirstName,
 				LastName:  session.User.LastName,
+				UserType:  session.User.UserType,
 			},
 		},
 	}, http.StatusOK)
 }
 
-
-func (controller Controller) GetDecryptData(w http.ResponseWriter, r *http.Request){
+func (controller Controller) GetDecryptData(w http.ResponseWriter, r *http.Request) {
 	type Request struct {
-		Data   string `json:"data"`
+		Data string `json:"data"`
 	}
-fmt.Println("###################################################")
+	fmt.Println("###################################################")
 	var req Request
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&req)
@@ -261,34 +264,33 @@ fmt.Println("###################################################")
 			Error: &Error{
 				Type:    "INVALID_REQUEST",
 				Message: err.Error(),
-				
 			},
 		}, http.StatusBadRequest)
 		return
-	} 
+	}
 
 	defer r.Body.Close()
-fmt.Println("################################################### , two")
+	fmt.Println("################################################### , two")
 
 	decryptedData, err := utils.AesDecription(req.Data)
 
-		if err != nil {
-			SendJSONResponse(w, Response{
-				Success: false,
-				Error: &Error{
-					Type:    err.(usecase.Error).Type,
-					Message: err.(usecase.Error).Message,
-				},
-			}, http.StatusBadRequest)
-			return
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(usecase.Error).Type,
+				Message: err.(usecase.Error).Message,
+			},
+		}, http.StatusBadRequest)
+		return
 
-		}
+	}
 
-		parts := strings.Split(decryptedData, ",")
+	parts := strings.Split(decryptedData, ",")
 
-		merchantIdString := parts[0]
+	merchantIdString := parts[0]
 
-		parsedUUID, err := uuid.Parse(merchantIdString)
+	parsedUUID, err := uuid.Parse(merchantIdString)
 	if err != nil {
 		SendJSONResponse(w, Response{
 			Success: false,
@@ -299,37 +301,34 @@ fmt.Println("################################################### , two")
 		}, http.StatusBadRequest)
 		return
 	}
-fmt.Println("################################################### , three",parsedUUID)
+	fmt.Println("################################################### , three", parsedUUID)
 
-		user, err := controller.interactor.GetUserById(parsedUUID)
-		if err != nil {
-			SendJSONResponse(w, Response{
-				Success: false,
-				Error: &Error{
-					Type:    err.(usecase.Error).Type,
-					Message: err.(usecase.Error).Message,
-				},
-			}, http.StatusBadRequest)
-			return
-		}
-fmt.Println("################################################### , four")
-
-
-		type Response2 struct{
-			Data string `json:"data"`
-			FullName string`json:"full_name"`
-		}
-
-		var res Response2
-
-		res.FullName = user.SirName + " "+user.FirstName + " " +  user.LastName
-		res.Data = decryptedData
-
-
+	user, err := controller.interactor.GetUserById(parsedUUID)
+	if err != nil {
 		SendJSONResponse(w, Response{
-			Success: true,
-			Data:    res,
-		}, http.StatusOK)
-	
+			Success: false,
+			Error: &Error{
+				Type:    err.(usecase.Error).Type,
+				Message: err.(usecase.Error).Message,
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+	fmt.Println("################################################### , four")
+
+	type Response2 struct {
+		Data     string `json:"data"`
+		FullName string `json:"full_name"`
+	}
+
+	var res Response2
+
+	res.FullName = user.SirName + " " + user.FirstName + " " + user.LastName
+	res.Data = decryptedData
+
+	SendJSONResponse(w, Response{
+		Success: true,
+		Data:    res,
+	}, http.StatusOK)
 
 }

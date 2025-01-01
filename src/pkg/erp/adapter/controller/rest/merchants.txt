@@ -1,0 +1,502 @@
+package rest
+
+import (
+	"auth/src/pkg/erp/usecase"
+	"auth/src/pkg/auth/adapter/controller/procedure"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strings"
+)
+
+func (controller Controller) CreateMerchant(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("||||||| || handle Create Merchant Request ||||||||")
+	controller.log.Println("Processing Create Merchant Request")
+
+	// Authenticate (AuthN)
+	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "UNAUTHORIZED",
+				Message: "Please provide an authentication token in header",
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Validate token
+	token := strings.Split(r.Header.Get("Authorization"), " ")[1]
+	session, err := controller.auth.GetCheckAuth(token)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(procedure.Error).Type,
+				Message: err.(procedure.Error).Message,
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Define the CreateMerchantRequest struct inside the function
+	type CreateMerchantRequest struct {
+		Name               string `json:"name"`
+		BusinessName       string `json:"business_name"`
+		RegistrationNumber string `json:"registration_number"`
+		Address            string `json:"address"`
+		ContactEmail       string `json:"contact_email"`
+		ContactPhone       string `json:"contact_phone"`
+	}
+
+	var req CreateMerchantRequest
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&req)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: err.Error(),
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+	controller.log.Printf("log Create Merchant Request ... %+v", req)
+	if req.Name == "" || req.BusinessName == "" || req.RegistrationNumber == "" || req.ContactEmail == "" {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "All fields except address and contact phone are required.",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	// Usecase [CREATE MERCHANT]
+	merchantID, err := controller.interactor.CreateMerchant(
+		session.User.Id,
+		req.Name,
+		req.BusinessName,
+		req.RegistrationNumber,
+		req.Address,
+		req.ContactEmail,
+		req.ContactPhone,
+	)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(usecase.Error).Type,
+				Message: err.(usecase.Error).Message,
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	// Send success response with the created merchant ID
+	SendJSONResponse(w, Response{
+		Success: true,
+		Data:    map[string]interface{}{"MerchantID": merchantID},
+	}, http.StatusCreated)
+}
+
+// ListMerchants lists all merchants.
+func (controller Controller) ListMerchants(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("||||||| || handle List Merchants Request ||||||||")
+	controller.log.Println("Processing List Merchants Request")
+
+	// Authenticate (AuthN)
+	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "UNAUTHORIZED",
+				Message: "Please provide an authentication token in header",
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Validate token
+	token := strings.Split(r.Header.Get("Authorization"), " ")[1]
+	session, err := controller.auth.GetCheckAuth(token)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(procedure.Error).Type,
+				Message: err.(procedure.Error).Message,
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Usecase [LIST MERCHANTS]
+	merchants, err := controller.interactor.ListMerchants(session.User.Id)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(usecase.Error).Type,
+				Message: err.(usecase.Error).Message,
+			},
+		}, http.StatusInternalServerError)
+		return
+	}
+
+	// Send success response with the list of merchants
+	SendJSONResponse(w, Response{
+		Success: true,
+		Data:    merchants,
+	}, http.StatusOK)
+}
+// ListMerchantCustomers lists customers for a specific merchant.
+func (controller Controller) ListMerchantCustomers(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("||||||| || handle List Merchant Customers Request ||||||||")
+	controller.log.Println("Processing List Merchant Customers Request")
+
+	// Authenticate (AuthN)
+	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "UNAUTHORIZED",
+				Message: "Please provide an authentication token in header",
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Validate token
+	token := strings.Split(r.Header.Get("Authorization"), " ")[1]
+	session, err := controller.auth.GetCheckAuth(token)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(procedure.Error).Type,
+				Message: err.(procedure.Error).Message,
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	merchantID := r.URL.Query().Get("id")
+	// Usecase [LIST MERCHANT CUSTOMERS]
+	customers, err := controller.interactor.ListMerchantCustomers(merchantID, session.User.Id)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(usecase.Error).Type,
+				Message: err.(usecase.Error).Message,
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	// Send success response with the list of customers
+	SendJSONResponse(w, Response{
+		Success: true,
+		Message: "Customers retrieved successfully",
+		Data:    customers,
+	}, http.StatusOK)
+}
+// DeactivateMerchant deactivates a specific merchant.
+func (controller Controller) DeactivateCustomers(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("||||||| || handle Deactivate Merchant Request ||||||||")
+	controller.log.Println("Processing Deactivate Merchant Request")
+
+	// Authenticate (AuthN)
+	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "UNAUTHORIZED",
+				Message: "Please provide an authentication token in header",
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Validate token
+	token := strings.Split(r.Header.Get("Authorization"), " ")[1]
+	session, err := controller.auth.GetCheckAuth(token)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(procedure.Error).Type,
+				Message: err.(procedure.Error).Message,
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Retrieve the merchant ID from the URL parameters
+	merchantID := r.URL.Query().Get("id")
+	if merchantID == "" {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "Merchant ID is required.",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	controller.log.Printf("log Deactivate Merchant Request for MerchantID: %s", merchantID)
+	// Usecase [DEACTIVATE MERCHANT]
+	err = controller.interactor.DeactivateCustomers(session.User.Id, merchantID)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(usecase.Error).Type,
+				Message: err.(usecase.Error).Message,
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	// Send success response indicating the merchant was deactivated
+	SendJSONResponse(w, Response{
+		Success: true,
+		Data:    map[string]interface{}{"MerchantID": merchantID},
+	}, http.StatusOK)
+}
+ 
+// GetMerchant retrieves a specific merchant by ID.
+func (controller Controller) GetMerchant(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("||||||| || handle Get Merchant Request ||||||||")
+	controller.log.Println("Processing Get Merchant Request")
+
+	// Authenticate (AuthN)
+	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "UNAUTHORIZED",
+				Message: "Please provide an authentication token in header",
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Validate token
+	token := strings.Split(r.Header.Get("Authorization"), " ")[1]
+	session, err := controller.auth.GetCheckAuth(token)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(procedure.Error).Type,
+				Message: err.(procedure.Error).Message,
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Retrieve the merchant ID from the URL parameters
+	merchantID := r.URL.Query().Get("id")
+	if merchantID == "" {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "Merchant ID is required.",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	// Usecase [GET MERCHANT]
+	merchant, err := controller.interactor.GetMerchant(session.User.Id, merchantID)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(usecase.Error).Type,
+				Message: err.(usecase.Error).Message,
+			},
+		}, http.StatusNotFound)
+		return
+	}
+
+	// Send success response with the retrieved merchant details
+	SendJSONResponse(w, Response{
+		Success: true,
+		Data:    merchant,
+	}, http.StatusOK)
+}
+
+func (controller Controller) UpdateMerchant(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("||||||| || handle Create Merchant Request ||||||||")
+	controller.log.Println("Processing Create Merchant Request")
+
+	// Authenticate (AuthN)
+	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "UNAUTHORIZED",
+				Message: "Please provide an authentication token in header",
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Validate token
+	token := strings.Split(r.Header.Get("Authorization"), " ")[1]
+	session, err := controller.auth.GetCheckAuth(token)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(procedure.Error).Type,
+				Message: err.(procedure.Error).Message,
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Define the CreateMerchantRequest struct inside the function
+	type CreateMerchantRequest struct {
+		Name               string `json:"name"`
+		BusinessName       string `json:"business_name"`
+		RegistrationNumber string `json:"registration_number"`
+		Address            string `json:"address"`
+		ContactEmail       string `json:"contact_email"`
+		ContactPhone       string `json:"contact_phone"`
+	}
+
+	// Decode the request from the body
+	var req CreateMerchantRequest
+	decoder := json.NewDecoder(r.Body)
+	err = decoder.Decode(&req)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: err.Error(),
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	// Log the request data
+	controller.log.Printf("log Create Merchant Request ... %+v", req)
+
+	// Validate the request fields
+	if req.Name == "" || req.BusinessName == "" || req.RegistrationNumber == "" || req.ContactEmail == "" {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "All fields except address and contact phone are required.",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	// Usecase [CREATE MERCHANT]
+	merchantID, err := controller.interactor.CreateMerchant(
+		session.User.Id,
+		req.Name,
+		req.BusinessName,
+		req.RegistrationNumber,
+		req.Address,
+		req.ContactEmail,
+		req.ContactPhone,
+	)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(usecase.Error).Type,
+				Message: err.(usecase.Error).Message,
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	// Send success response with the created merchant ID
+	SendJSONResponse(w, Response{
+		Success: true,
+		Data:    map[string]interface{}{"MerchantID": merchantID},
+	}, http.StatusCreated)
+}
+
+// DeactivateMerchant deactivates a specific merchant.
+func (controller Controller) DeactivateMerchant(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("||||||| || handle Deactivate Merchant Request ||||||||")
+	controller.log.Println("Processing Deactivate Merchant Request")
+
+	// Authenticate (AuthN)
+	if len(strings.Split(r.Header.Get("Authorization"), " ")) != 2 {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "UNAUTHORIZED",
+				Message: "Please provide an authentication token in header",
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Validate token
+	token := strings.Split(r.Header.Get("Authorization"), " ")[1]
+	session, err := controller.auth.GetCheckAuth(token)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(procedure.Error).Type,
+				Message: err.(procedure.Error).Message,
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	// Retrieve the merchant ID from the URL parameters
+	merchantID := r.URL.Query().Get("id")
+	if merchantID == "" {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: "Merchant ID is required.",
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	// Log the request data
+	controller.log.Printf("log Deactivate Merchant Request for MerchantID: %s", merchantID)
+
+	// Usecase [DEACTIVATE MERCHANT]
+	err = controller.interactor.DeactivateMerchant(session.User.Id, merchantID)
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(usecase.Error).Type,
+				Message: err.(usecase.Error).Message,
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	// Send success response indicating the merchant was deactivated
+	SendJSONResponse(w, Response{
+		Success: true,
+		Data:    map[string]interface{}{"MerchantID": merchantID},
+	}, http.StatusOK)
+}
+ 

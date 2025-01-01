@@ -41,13 +41,16 @@ func (repo PsqlRepo) FindUserUsingPhoneIdentity(phoneId uuid.UUID) (*entity.User
 
 	var sirName sql.NullString
 	var lastName sql.NullString
+	var userType sql.NullString // Add variable for user_type
 
 	err := repo.db.QueryRow(fmt.Sprintf(`
-	SELECT users.id, users.sir_name, users.first_name, users.last_name
+	SELECT users.id, users.sir_name, users.first_name, users.last_name, users.user_type
 	FROM %s.phone_identities
 	INNER JOIN %s.users ON %s.users.id = phone_identities.user_id
 	WHERE phone_id = $1;
-	`, repo.schema, repo.schema, repo.schema), phoneId).Scan(&user.Id, &sirName, &user.FirstName, &lastName)
+	`, repo.schema, repo.schema, repo.schema), phoneId).Scan(
+		&user.Id, &sirName, &user.FirstName, &lastName, &userType,
+	)
 
 	if sirName.Valid {
 		user.SirName = sirName.String
@@ -55,6 +58,12 @@ func (repo PsqlRepo) FindUserUsingPhoneIdentity(phoneId uuid.UUID) (*entity.User
 
 	if lastName.Valid {
 		user.LastName = lastName.String
+	}
+
+	if userType.Valid {
+		user.UserType = userType.String // Set the user_type if valid
+	} else {
+		user.UserType = "UNKNOWN" // Default value if user_type is not found
 	}
 
 	if err != nil {
@@ -75,15 +84,18 @@ func (repo PsqlRepo) FindUserById(id uuid.UUID) (*entity.User, error) {
 
 	var sirName sql.NullString
 	var lastName sql.NullString
+	var userType sql.NullString // Add variable for user_type
+
 	fmt.Println("################################################### , repo 1", id)
-	sqlStmt := `SELECT id, sir_name, first_name, last_name, created_at
+
+	sqlStmt := `SELECT id, sir_name, first_name, last_name, user_type, created_at
 	FROM auth.users
 	WHERE id = $1;
 	`
 
-	err := repo.db.QueryRow(sqlStmt, id).Scan(&user.Id, &sirName, &user.FirstName, &lastName, &user.CreatedAt)
+	err := repo.db.QueryRow(sqlStmt, id).Scan(&user.Id, &sirName, &user.FirstName, &lastName, &userType, &user.CreatedAt)
 	if err != nil {
-		fmt.Println((err))
+		fmt.Println(err)
 		return &entity.User{}, nil
 	}
 	fmt.Println("################################################### , repo 10")
@@ -95,6 +107,13 @@ func (repo PsqlRepo) FindUserById(id uuid.UUID) (*entity.User, error) {
 	if lastName.Valid {
 		user.LastName = lastName.String
 	}
+
+	if userType.Valid {
+		user.UserType = userType.String // Set the user_type if valid
+	} else {
+		user.UserType = "UNKNOWN" // Default value if user_type is not found
+	}
+
 	fmt.Println("################################################### , repo 2")
 
 	return &user, nil

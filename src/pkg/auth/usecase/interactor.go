@@ -37,6 +37,9 @@ type AuthNInteractor interface {
 	// Session
 	CreateSession(token string) (*entity.Session, string, error)
 	CheckSession(token string) (*entity.Session, error)
+	//Permission
+	CheckPermission(userID uuid.UUID, requiredPermission entity.Permission) (bool, error)
+
 }
 type AuthZInteractor interface {
 	// Responsible for access management
