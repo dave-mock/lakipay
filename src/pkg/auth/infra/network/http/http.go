@@ -36,7 +36,7 @@ func New(log *log.Logger) Server {
 
 	s := &http.Server{
 		Handler: accessControl(sm),
-		Addr:    "0.0.0.0:3000",
+		Addr:    "0.0.0.0:8008",
 	}
 
 	// sm.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

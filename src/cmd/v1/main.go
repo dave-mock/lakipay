@@ -2,11 +2,12 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	// HTTP Server
 
-	"auth/src/pkg/auth/infra/network/http"
+	lhttp "auth/src/pkg/auth/infra/network/http"
 	// Postgres Storage
 	"auth/src/pkg/auth/infra/storage/psql"
 	// SMS
@@ -49,6 +50,11 @@ import (
 	storage "auth/src/pkg/storage/adapter/controller/rest"
 	storageRepo "auth/src/pkg/storage/adapter/gateway/repo/psql"
 	storageUsecase "auth/src/pkg/storage/usecase"
+
+	// [CHECKOUT]
+	checkout "auth/src/pkg/checkout/adapter/controller/rest"
+	checkoutRepo "auth/src/pkg/checkout/adapter/gateway/repo/psql"
+	checkoutService "auth/src/pkg/checkout/service/basic"
 )
 
 func main() {
@@ -64,8 +70,10 @@ func main() {
 
 	// [Input Adapters]
 	// [SERVER] HTTP
-	s := http.New(log)
+	s := lhttp.New(log)
 	defer s.Serve()
+
+	s.ServeMux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./public"))))
 
 	// [Module Adapters]
 
@@ -102,11 +110,14 @@ func main() {
 	}
 
 	// [ACCOUNT]
-	_accRepo, err := accRepo.New(log, db)
+	var _accRepo accUsecase.Repo
+	var accService accUsecase.Interactor
+	_accRepo, err = accRepo.New(log, db)
 	if err != nil {
 		log.Println(err)
 	} else {
-		acc.New(log, accUsecase.New(log, _accRepo), s.ServeMux, procedure.New(log, authUsecase.New(log, _authRepo, sms.New(log))))
+		accService = accUsecase.New(log, _accRepo)
+		acc.New(log, accService, s.ServeMux, procedure.New(log, authUsecase.New(log, _authRepo, sms.New(log))))
 	}
 	// ERP
 	_erpRepo, err := erpRepo.New(log, db)
@@ -122,5 +133,13 @@ func main() {
 		log.Println(err)
 	} else {
 		access_control.New(log, accessUsecase.New(log, _accessRepo), s.ServeMux, procedure.New(log, authUsecase.New(log, _authRepo, sms.New(log))))
+	}
+
+	// Checkout
+	_checkoutRepo, err := checkoutRepo.New(log, db)
+	if err != nil {
+		log.Println(err)
+	} else {
+		checkout.New(log, s.ServeMux, checkoutService.New(log, _checkoutRepo, accService))
 	}
 }

@@ -1,5 +1,5 @@
 dev:
-	export $$(xargs < .env) && go run src/cmd/v1/main.go
+	export $$(xargs < .env.local) && go run src/cmd/v1/main.go
 test:
 	export $$(xargs < .env.test) && go run src/cmd/v1/main.go
 build:
