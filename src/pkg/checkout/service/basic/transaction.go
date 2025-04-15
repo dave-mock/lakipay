@@ -157,6 +157,54 @@ func (service BasicCheckoutService) ConfirmTransaction(id string) (any, error) {
 				"type": "USSD",
 			}
 		}
+	case "TELEBIRR":
+		{
+			err = processors.ProcessTeleBirr(txn.Id, txn.Pricing.Amount+txn.Pricing.Fees[0]["transaction"], txn.Details["phone"].(string))
+			if err != nil {
+				return nil, err
+			}
+
+			txn.Status = struct {
+				Value   entity.TransactionStatus
+				Message string
+			}{
+				Value:   entity.TxnProcessing,
+				Message: "Waiting for payment completion",
+			}
+
+			err = service.repo.UpdateTransaction(*txn)
+			if err != nil {
+				return nil, err
+			}
+
+			res = map[string]interface{}{
+				"type": "USSD",
+			}
+		}
+	case "M_PESA":
+		{
+			err = processors.ProcessMPesa(txn.Id, txn.Pricing.Amount+txn.Pricing.Fees[0]["transaction"], txn.Details["phone"].(string))
+			if err != nil {
+				return nil, err
+			}
+
+			txn.Status = struct {
+				Value   entity.TransactionStatus
+				Message string
+			}{
+				Value:   entity.TxnProcessing,
+				Message: "Waiting for payment completion",
+			}
+
+			err = service.repo.UpdateTransaction(*txn)
+			if err != nil {
+				return nil, err
+			}
+
+			res = map[string]interface{}{
+				"type": "USSD",
+			}
+		}
 	}
 
 	return res, nil
