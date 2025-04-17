@@ -3,8 +3,6 @@ package rest
 import (
 	"auth/src/pkg/checkout/core/entity"
 	"encoding/json"
-	"encoding/xml"
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -210,93 +208,64 @@ func (controller Controller) UpdateCybersourceStatus(w http.ResponseWriter, r *h
 }
 
 func (controller Controller) UpdateCBEBirrStatus(w http.ResponseWriter, r *http.Request) {
-	type Header struct {
-		XMLName                  xml.Name `xml:"Header"`
-		Version                  string   `xml:"Version"`
-		OriginatorConversationID string   `xml:"OriginatorConversationID"`
-		ConversationID           string   `xml:"ConversationID"`
+	type Request struct {
+		ReferenceId  string `json:"referenceId"`
+		Status       string `json:"status"`
+		Message      string `json:"message"`
+		ProviderTxId string `json:"providerTxId"`
+		ProviderData string `json:"providerData"`
+		Timestamp    string `json:"timestamp"`
 	}
 
-	type Body struct {
-		XMLName           xml.Name `xml:"Body"`
-		ResultType        string   `xml:"ResultType"`
-		ResultCode        string   `xml:"ResultCode"`
-		ResultDesc        string   `xml:"ResultDesc"`
-		TransactionResult struct {
-			TransactionID string `xml:"TransactionID"`
-		} `xml:"TransactionResult"`
+	var req Request
+
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&req)
+
+	var status entity.TransactionStatus = entity.TxnDeclined
+	if req.Status == "SUCCESS" {
+		status = entity.TxnCompleted
 	}
+	controller.interactor.UpdatePaymentStatus(req.ReferenceId, struct {
+		Value   entity.TransactionStatus
+		Message string
+	}{
+		Value:   status,
+		Message: req.Message,
+	})
 
-	type Result struct {
-		XMLName xml.Name `xml:"Result"`
-		Header  Header   `xml:"Header"`
-		Body    Body     `xml:"Body"`
-	}
-
-	type Body1 struct {
-		XMLName xml.Name `xml:"Body"`
-		Result  Result   `xml:"Result"`
-	}
-
-	type Envelope struct {
-		XMLName xml.Name `xml:"Envelope"`
-		Body    Body1    `xml:"Body"`
-	}
-
-	var parsedResult Envelope
-
-	decoder := xml.NewDecoder(r.Body)
-	err := decoder.Decode(&parsedResult)
-	controller.log.Println(err)
-	controller.log.Println(parsedResult)
-
-	switch fmt.Sprintf("%s%s", parsedResult.Body.Result.Body.ResultType, parsedResult.Body.Result.Body.ResultCode) {
-	case "00":
-		{
-			controller.interactor.UpdatePaymentStatus(parsedResult.Body.Result.Header.OriginatorConversationID, struct {
-				Value   entity.TransactionStatus
-				Message string
-			}{
-				Value:   entity.TxnCompleted,
-				Message: "Transaction Completed",
-			})
-			return
-		}
-	case "01":
-		{
-			controller.interactor.UpdatePaymentStatus(parsedResult.Body.Result.Header.OriginatorConversationID, struct {
-				Value   entity.TransactionStatus
-				Message string
-			}{
-				Value:   entity.TxnCanceled,
-				Message: "Transaction Cancelled",
-			})
-			return
-		}
-	default:
-		{
-			controller.interactor.UpdatePaymentStatus(parsedResult.Body.Result.Header.OriginatorConversationID, struct {
-				Value   entity.TransactionStatus
-				Message string
-			}{
-				Value:   entity.TxnDeclined,
-				Message: "Transaction Declined",
-			})
-			return
-		}
-	}
+	w.Write([]byte(""))
+}
+func (controller Controller) UpdateTelebirrStatus(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(""))
+}
+func (controller Controller) UpdateMPesaStatus(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(""))
 }
 
 func (controller Controller) GetHandleTransactionNotification(w http.ResponseWriter, r *http.Request) {
+
+	var basiURL = ""
+
 	switch r.Host {
 	case "https://secureacceptance.cybersource.com":
 		{
 			controller.UpdateCybersourceStatus(w, r)
 			return
 		}
-	case "http://196.190.251.169:33180":
+	case basiURL:
 		{
-			controller.UpdateCybersourceStatus(w, r)
+			controller.UpdateCBEBirrStatus(w, r)
+			return
+		}
+	case "https://api.lakipay.co/cbe-birr":
+		{
+			controller.UpdateTelebirrStatus(w, r)
+			return
+		}
+	case "https://api.safaricom.et":
+		{
+			controller.UpdateMPesaStatus(w, r)
 			return
 		}
 	}

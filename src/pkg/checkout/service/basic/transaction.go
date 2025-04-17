@@ -53,9 +53,9 @@ func (service BasicCheckoutService) InitTransaction(
 		return nil, err
 	}
 
-	// if !gateway.CanProcess {
-	// 	return nil, errors.New("the selected medium can not process transaction")
-	// }
+	if !gateway.CanProcess {
+		return nil, errors.New("the selected medium can not process transaction")
+	}
 
 	// Init Transaction
 	txn := entity.Transaction{

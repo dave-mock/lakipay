@@ -7,7 +7,8 @@ import (
 )
 
 func ProcessTeleBirr(id string, amount float64, phone string) error {
-	url := "https://backend.lakipay.co/account/telebirr/ussd-push"
+
+	url := "https://api.lakipay.co/account/telebirr/ussd-push"
 	method := http.MethodPost
 
 	pld := map[string]interface{}{
@@ -15,7 +16,7 @@ func ProcessTeleBirr(id string, amount float64, phone string) error {
 		"OriginatorConversationID": id,
 		"ThirdPartyID":             "Laki-Pay",
 		"Password":                 "jBq7JfxTs0C5ji0VPKakmRSgBbeh4NO0juJ1LXnPIOw=",
-		"ResultURL":                "http://api.lakipay.et:6080/api/accounts/telebirr/transactionstatus",
+		"ResultURL":                "https://api.lakipay.co/api/v1/checkout/transactions/notify",
 		"Timestamp":                "20150101010101",
 		"IdentifierType":           12,
 		"Identifier":               "51437701",
