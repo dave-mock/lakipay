@@ -1,0 +1,47 @@
+
+								<!DOCTYPE html>
+								<html lang="en">
+									<head>
+										<meta charset="UTF-8">
+										<!-- <meta name="viewport" content="width=vw, initial-scale=1.0"> -->
+										<title>Cybersource Payment</title>
+										<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+									</head>
+									<body>
+										<form id='payment_form' method='post' action="https://secureacceptance.cybersource.com/pay">
+											<input type='hidden' id='access_key' name='access_key' />
+											<input type='hidden' id='locale' name='locale' />
+											<input type='hidden' id='payment_method' name='payment_method' />
+											<input type='hidden' id='profile_id' name='profile_id' />
+											<input type='hidden' id='signature' name='signature' />
+											<input type='hidden' id='signed_date_time' name='signed_date_time' />
+											<input type='hidden' id='signed_field_names' name='signed_field_names' />
+											<input type='hidden' id='transaction_type' name='transaction_type' />
+											<input type='hidden' id='transaction_uuid' name='transaction_uuid' />
+											<input type='hidden' id='unsigned_field_names' name='unsigned_field_names' />
+											<input type='hidden' id='reference_number' name='reference_number' />
+											<input type='hidden' id='amount' name='amount' />
+											<input type='hidden' id='currency' name='currency' />
+										</form>
+									</body>
+									<script type="text/javascript">
+										function load() {
+											document.getElementById("access_key").value = "66ad734a971a3f79b84f183c4e52b790";
+											document.getElementById("locale").value = "en-US";
+											document.getElementById("payment_method").value = "card";
+											document.getElementById("profile_id").value = "2674CE2D-EA15-4D9F-85D0-713FC5F6329F";
+											document.getElementById("signature").value = "KZSyBVpa3NX5KW8ji0sCkDpcn8Gb1z2675FT0KQg8zU=";
+											document.getElementById("signed_date_time").value = "2025-04-10T10:56:16Z";
+											document.getElementById("signed_field_names").value = "access_key,amount,currency,locale,payment_method,profile_id,reference_number,signed_date_time,signed_field_names,transaction_type,transaction_uuid,unsigned_field_names";
+											document.getElementById("transaction_type").value = "sale";
+											document.getElementById("transaction_uuid").value = "cvrq7fjdt30jtqhmd7cg";
+											document.getElementById("unsigned_field_names").value = "";
+											document.getElementById("reference_number").value = "e7d6c2bb-74ab-4b5a-a020-79664e1d11e9";
+											document.getElementById("amount").value = "50";
+											document.getElementById("currency").value = "ETB";
+											document.getElementById("payment_form").submit();
+										}
+										window.onload = load;
+									</script>
+								</html>
+								

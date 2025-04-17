@@ -9,7 +9,7 @@ import (
 )
 
 func (repo PsqlRepo) FindAccountsByUserId(userId uuid.UUID) ([]entity.Account, error) {
-	var accs []entity.Account = make([]entity.Account, 0)
+	var accs []entity.Account
 
 	rows, err := repo.db.Query(`
 	SELECT id, title, "type", "default"

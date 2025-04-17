@@ -37,15 +37,15 @@ func (uc Usecase) GetUserAccounts(id uuid.UUID) ([]entity.Account, error) {
 	}
 
 	if !exists {
-		acc, err := uc.CreateStoredAccount(id, "Stored Value", true)
-		if err != nil {
-			return nil, Error{
-				Type:    "COULD_NOT_FIND_ACCOUNTS",
-				Message: err.Error(),
-			}
-		}
+		// acc, err := uc.CreateStoredAccount(id, "Stored Value", true)
+		// if err != nil {
+		// 	return nil, Error{
+		// 		Type:    "COULD_NOT_FIND_ACCOUNTS",
+		// 		Message: err.Error(),
+		// 	}
+		// }
 
-		accs = append(accs, *acc)
+		// accs = append(accs, *acc)
 	}
 
 	return accs, nil

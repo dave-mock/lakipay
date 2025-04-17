@@ -369,7 +369,7 @@ func (uc Usecase) CreateTransactionInitiate(userId uuid.UUID, from uuid.UUID, to
 
 	has_challenge := true
 
-	if amount < 3 {
+	if amount < 0 {
 		has_challenge = false
 	}
 

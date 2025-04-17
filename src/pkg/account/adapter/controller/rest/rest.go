@@ -204,6 +204,42 @@ func New(log *log.Logger, interactor usecase.Interactor, sm *http.ServeMux, auth
 		controller.log.Println(string(body))
 		w.Write([]byte("EPG"))
 	})
+
+	// // Gateways
+	// sm.HandleFunc("/api/v1/gateways", func(w http.ResponseWriter, r *http.Request) {
+	// 	switch r.Method {
+	// 	case http.MethodGet:
+	// 		{
+	// 			controller.getGateways(w, r)
+	// 			return
+	// 		}
+	// 	}
+	// })
+
+	// /// Checkout
+	// ///
+	// /// Init
+	// sm.HandleFunc("/api/v1/checkout/init", func(w http.ResponseWriter, r *http.Request) {
+	// 	switch r.Method {
+	// 	case http.MethodPost:
+	// 		{
+	// 			controller.getInitCheckout(w, r)
+	// 			return
+	// 		}
+	// 	}
+	// })
+
+	// /// Process
+	// sm.HandleFunc("/api/v1/checkout/process", func(w http.ResponseWriter, r *http.Request) {
+	// 	switch r.Method {
+	// 	case http.MethodPost:
+	// 		{
+	// 			controller.getProcessCheckout(w, r)
+	// 			return
+	// 		}
+	// 	}
+	// })
+
 	return controller
 }
 
