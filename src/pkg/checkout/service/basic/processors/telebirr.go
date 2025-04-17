@@ -7,10 +7,25 @@ import (
 )
 
 func ProcessTeleBirr(id string, amount float64, phone string) error {
-	url := "https://"
+	url := "https://backend.lakipay.co/account/telebirr/ussd-push"
 	method := http.MethodPost
 
-	pld := map[string]interface{}{}
+	pld := map[string]interface{}{
+		"CommandID":                "InitTrans_BuyGoodsForCustomer",
+		"OriginatorConversationID": id,
+		"ThirdPartyID":             "Laki-Pay",
+		"Password":                 "jBq7JfxTs0C5ji0VPKakmRSgBbeh4NO0juJ1LXnPIOw=",
+		"ResultURL":                "http://api.lakipay.et:6080/api/accounts/telebirr/transactionstatus",
+		"Timestamp":                "20150101010101",
+		"IdentifierType":           12,
+		"Identifier":               "51437701",
+		"SecurityCredential":       "SvO8Px+vMnrGxTnZFw5tjUopf08sr1GZxs7qE3lmzG0=",
+		"ShortCode":                "514377",
+		"PrimaryParty":             phone,
+		"ReceiverParty":            "514377",
+		"Amount":                   amount,
+		"Currency":                 "ETB",
+	}
 
 	serPld, err := json.Marshal(pld)
 	if err != nil {

@@ -4,18 +4,20 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	// "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 	"github.com/lib/pq"
 )
 
 func New(log *log.Logger) (*sql.DB, error) {
-	// envFilePath := "C:\\Users\\Rinatoh computer\\Desktop\\lakipay\\.env"
-	// err := godotenv.Load(envFilePath)
-	// if err != nil {
-	// 	log.Println("Error loading .env file:", err)
-	// 	return nil, err
-	// }
+	envFilePath := "C:\\Users\\Rinatoh computer\\Desktop\\lakipay\\.env"
+	err := godotenv.Load(envFilePath)
+	if err != nil {
+		log.Println("Error loading .env file:", err)
+		return nil, err
+	}
 
 	const (
 		ErrFailedToConnect = "FAILED_TO_CONNECT"
@@ -27,18 +29,12 @@ func New(log *log.Logger) (*sql.DB, error) {
 	log.Println("Initiating pg db")
 
 	var (
-		host     = "35.171.22.161"
-		user     = "postgres"
-		password = "postgres"
-		dbName   = "postgres"
-		sslMode  = "disable"
-		port     = "5433"
-		// host, _     = os.LookupEnv("DB_HOST")
-		// user, _     = os.LookupEnv("DB_USER")
-		// password, _ = os.LookupEnv("DB_PASS")
-		// dbName, _   = os.LookupEnv("DB_NAME")
-		// sslMode, _  = os.LookupEnv("SSL_MODE")
-		// port, _     = os.LookupEnv("DB_PORT")
+		host, _     = os.LookupEnv("DB_HOST")
+		user, _     = os.LookupEnv("DB_USER")
+		password, _ = os.LookupEnv("DB_PASS")
+		dbName, _   = os.LookupEnv("DB_NAME")
+		sslMode, _  = os.LookupEnv("SSL_MODE")
+		port, _     = os.LookupEnv("DB_PORT")
 	)
 
 	// pg connection
