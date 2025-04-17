@@ -2988,6 +2988,17 @@ func (uc Usecase) GetstorePublicKeyHandler(key string, id uuid.UUID, device stri
 	return "Public key have stored!", nil
 }
 
+func (uc Usecase) GetfetchPublicKeyHandler(id uuid.UUID) (string, error) {
+
+	res, err := uc.repo.GetPuplicKey("", id)
+
+	if err != nil {
+		return "", err
+	}
+
+	return res[0].PublicKey, nil
+}
+
 func generateRSAKeyPair() (string, string, error) {
 	// Generate RSA key pair
 	privateKey, err := rsa.GenerateKey(rand2.Reader, 1024)

@@ -1922,3 +1922,49 @@ func (controller Controller) GetstorePublicKeyHandler(w http.ResponseWriter, r *
 	}, http.StatusOK)
 
 }
+
+func (controller Controller) GetfetchPublicKeyHandler(w http.ResponseWriter, r *http.Request) {
+
+	type Request struct {
+		Token string
+	}
+
+	var req Request
+	token := strings.Split(r.Header.Get("Authorization"), " ")
+	if len(token) == 2 {
+		req.Token = token[1]
+	}
+
+	session, err := controller.auth.GetCheckAuth(req.Token)
+
+	if err != nil {
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    err.(auth.Error).Type,
+				Message: err.(auth.Error).Message,
+			},
+		}, http.StatusUnauthorized)
+		return
+	}
+
+	key, err := controller.interactor.GetfetchPublicKeyHandler(session.User.Id)
+	if err != nil {
+		controller.log.Println(err)
+		// Send error response
+		SendJSONResponse(w, Response{
+			Success: false,
+			Error: &Error{
+				Type:    "INVALID_REQUEST",
+				Message: err.Error(),
+			},
+		}, http.StatusBadRequest)
+		return
+	}
+
+	SendJSONResponse(w, Response{
+		Success: true,
+		Data:    key,
+	}, http.StatusOK)
+
+}

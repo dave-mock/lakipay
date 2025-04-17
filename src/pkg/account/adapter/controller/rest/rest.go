@@ -66,7 +66,19 @@ func New(log *log.Logger, interactor usecase.Interactor, sm *http.ServeMux, auth
 	sm.HandleFunc("/store-public-key", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			controller.GetstorePublicKeyHandler(w, r)
+			{
+				controller.GetstorePublicKeyHandler(w, r)
+			}
+		}
+	})
+
+	// Store Public Key
+	sm.HandleFunc("/public-key", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			{
+				controller.GetfetchPublicKeyHandler(w, r)
+			}
 		}
 	})
 

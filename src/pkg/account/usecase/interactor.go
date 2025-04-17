@@ -53,6 +53,7 @@ type Interactor interface {
 	SendGenerateChallenge(id uuid.UUID, deviceId string) (string, error)
 	GetverifySignature(id uuid.UUID, challenge string, sign string) (string, error)
 	GetstorePublicKeyHandler(key string, id uuid.UUID, device string) (string, error)
+	GetfetchPublicKeyHandler(id uuid.UUID) (string, error)
 
 	InitPreSession(txtId uuid.UUID) (entity.TransactionSession, error)
 	VerifyTransaction(UserId uuid.UUID, token string, transactionChallenges entity.TransactionChallange, challengeType string) (string, error)
